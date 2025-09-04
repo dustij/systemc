@@ -82,3 +82,6 @@ _UpgradeReport_Files/
 /.vs
 /CMakeSettings.json
 /.clangd
+
+# dumping objects to test compiling works
+*/*/trash/
