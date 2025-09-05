@@ -1,17 +1,11 @@
 /******************************************************************************
  *                                                                            *
- * Copyright (C) 2022-2025 MachineWare GmbH                                   *
+ * Copyright 2023 MachineWare GmbH                                            *
+ * All Rights Reserved                                                        *
  *                                                                            *
- * This file is licensed for non-commercial use only.                         *
- * You may use, modify, and distribute this file for personal or educational  *
- * purposes, but any commercial use, including but not limited to selling,    *
- * licensing, or integrating this code into proprietary software, is strictly *
- * prohibited unless otherwise agreed to in writing by MachineWare GmbH.      *
- *                                                                            *
- * THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS   *
- * OR IMPLIED. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE   *
- * FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE OF         *
- * THIS SOFTWARE.                                                             *
+ * This is unpublished proprietary work owned by MachineWare GmbH. It may be  *
+ * used, modified and distributed in accordance to the license specified by   *
+ * the license file in the root directory of this project.                    *
  *                                                                            *
  ******************************************************************************/
 
@@ -19,33 +13,62 @@
 #include "inscight/database.h"
 #include "inscight/database_csv.h"
 #include "inscight/database_sql.h"
+// #include "inscight/database_hybrid.h"
+#include "inscight/database_zarr.h"
 
-namespace inscight {
+namespace inscight
+{
 
-static database* create_database(const std::string& options) {
-    if (options.find("csv") != std::string::npos)
-        return new database_csv(options);
-    else
-        return new database_sql(options);
-}
+    static database *create_database(const std::string &options)
+    {
 
-context::context(const std::string& options):
-    m_db(create_database(options)) {
-    m_db->start();
-}
+        // Consider adding a mode that collapses all of the CSV data into one file
+        if (options.find("csv") != std::string::npos)
+            return new database_csv(options);
+        // else if (options.find("hybrid") != std::string::npos)
+        //     return new database_hybrid(options);
+        else if (options.find("zarr") != std::string::npos)
+            return new database_zarr(options);
+        else
+            // Sqlite Format
+            return new database_sql(options);
 
-context::~context() {
-    delete m_db;
-}
+        // Exotic Simulation Data Formats
+        /*
+        else if (options.find("sqlite") != std::string::npos)
+            return new database_sql(options);
+        else if (options.find("postgres") != std::string::npos)
+            return new database_postgress(options);
+        else if (options.find("netcdf") != std::string::npos)
+            return new database_netcdf(options);
+        else if (options.find("zaar") != std::string::npos)
+            return new database_zaar(options);
+        else if (options.find("mongodb") != std::string::npos)
+            return new database_mongodb(options);
+        else if (options.find("wireshark") != std::string::npos)
+            return new database_wireshark(options);
+        */
+    }
 
-static context* init() {
-    const char* str = getenv("INSCIGHT");
-    if (str == nullptr || strcmp(str, "0") == 0)
-        return nullptr;
-    static context singleton(str);
-    return &singleton;
-}
+    context::context(const std::string &options) : m_db(create_database(options))
+    {
+        m_db->start();
+    }
 
-context* ctx = init();
+    context::~context()
+    {
+        delete m_db;
+    }
+
+    static context *init()
+    {
+        const char *str = getenv("INSCIGHT");
+        if (str == nullptr || strcmp(str, "0") == 0)
+            return nullptr;
+        static context singleton(str);
+        return &singleton;
+    }
+
+    context *ctx = init();
 
 } // namespace inscight

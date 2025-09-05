@@ -1,0 +1,512 @@
+/******************************************************************************
+ *                                                                            *
+ * Copyright 2023 MachineWare GmbH                                            *
+ * All Rights Reserved                                                        *
+ *                                                                            *
+ * This is unpublished proprietary work owned by MachineWare GmbH. It may be  *
+ * used, modified and distributed in accordance to the license specified by   *
+ * the license file in the root directory of this project.
+ *
+ * Changes for hybrid database
+ * Copyright 2025
+ * Modifications by George Frazier           *
+ *                                                                            *
+ ******************************************************************************/
+
+#include "inscight/database_hybrid.h"
+#include <cstdint>
+#include <sys/stat.h>  // For mkdir
+#include <sys/types.h> // For mode_t
+#include <sstream>
+#include <queue>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <unistd.h>
+#include <cstdlib>
+#include <atomic>
+#include <vector>
+#include <iostream>
+
+#ifdef _MSC_VER
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+
+#define SQL_ERROR(...)                \
+    do                                \
+    {                                 \
+        fprintf(stderr, __VA_ARGS__); \
+        fprintf(stderr, "\n");        \
+        fflush(stderr);               \
+        abort();                      \
+    } while (0)
+
+#define SQL_ERROR_ON(ret, ...)      \
+    do                              \
+    {                               \
+        if (ret != SQLITE_OK)       \
+        {                           \
+            SQL_ERROR(__VA_ARGS__); \
+        }                           \
+    } while (0)
+
+const std::string OUTPUT_DIR = "parquet_data/";
+
+namespace inscight
+{
+
+    database_hybrid::db::db() : m_db()
+    {
+    }
+
+    database_hybrid::db::~db()
+    {
+        if (m_db != nullptr)
+            sqlite3_close(m_db);
+    }
+
+    void database_hybrid::db::open()
+    {
+        static char name[256];
+        memset(name, 0, sizeof(name));
+        snprintf(name, sizeof(name), "sim.%d.db", (int)getpid());
+        int ret = sqlite3_open(name, &m_db);
+        SQL_ERROR_ON(ret, "failed to open database: %s", sqlite3_errmsg(m_db));
+    }
+
+    database_hybrid::stmt::stmt(db &d, const std::string &text) : m_db(d),
+                                                                  m_stmt(nullptr),
+                                                                  m_text(text)
+    {
+    }
+
+    database_hybrid::stmt::~stmt()
+    {
+        if (m_stmt)
+            sqlite3_finalize(m_stmt);
+    }
+
+    void database_hybrid::stmt::prepare()
+    {
+        int ret = sqlite3_prepare_v2(m_db.handle(), text(), -1, &m_stmt, nullptr);
+        SQL_ERROR_ON(ret, "failed to prepare '%s': %s", text(), m_db.error());
+    }
+
+    void database_hybrid::stmt::bind(size_t idx, unsigned long long val)
+    {
+        if (m_stmt == nullptr)
+            prepare();
+
+        int ret = sqlite3_bind_int64(m_stmt, idx, val);
+        SQL_ERROR_ON(ret, "failed to bind arg %zu: %s", idx, m_db.error());
+    }
+
+    void database_hybrid::stmt::bind(size_t idx, const char *str)
+    {
+        if (m_stmt == nullptr)
+            prepare();
+
+        int ret = sqlite3_bind_text(m_stmt, idx, str, -1, SQLITE_TRANSIENT);
+        SQL_ERROR_ON(ret, "failed to bind arg %zu: %s", idx, m_db.error());
+    }
+
+    void database_hybrid::stmt::execute()
+    {
+        if (m_stmt == nullptr)
+            prepare();
+
+        int ret = sqlite3_step(m_stmt);
+        if (ret != SQLITE_DONE)
+            SQL_ERROR("failed to evaluate '%s': %s", text(), m_db.error());
+
+        ret = sqlite3_clear_bindings(m_stmt);
+        SQL_ERROR_ON(ret, "failed to clear command bindings");
+        ret = sqlite3_reset(m_stmt);
+        SQL_ERROR_ON(ret, "failed to reset command");
+    }
+
+    void database_hybrid::exec(const std::string &cmd)
+    {
+        stmt x(m_db, cmd);
+        x.execute();
+    }
+
+    void database_hybrid::init()
+    {
+        struct stat info;
+
+        m_db.open();
+        exec("CREATE TABLE meta(pid BIGINT PRIMARY KEY, path STRING, user STRING, version STRING, time DATETIME);");
+        exec("CREATE TABLE transactions(id INTEGER PRIMARY KEY, st BIGINT, dir INTEGER, port BIGINT, proto INTEGER);");
+
+        if (stat(OUTPUT_DIR.c_str(), &info) != 0)
+        {
+            // Directory does not exist, create it
+            if (mkdir(OUTPUT_DIR.c_str(), 0777) == 0)
+            {
+                std::cout << "Created directory: " << OUTPUT_DIR << std::endl;
+            }
+            else
+            {
+                std::cerr << "Error: Unable to create directory " << OUTPUT_DIR << std::endl;
+            }
+        }
+    }
+
+    void database_hybrid::begin(size_t n)
+    {
+        m_stmt_tx_begin.execute();
+    }
+
+    void database_hybrid::end(size_t n)
+    {
+        m_stmt_tx_end.execute();
+    }
+
+    void database_hybrid::gen_meta(const meta_info &info)
+    {
+        std::stringstream ss;
+        ss << "INSERT INTO meta (pid, path, user, version, time) VALUES ("
+           << info.pid << ",'" << info.path << "','" << info.user << "','"
+           << info.version << "'," << info.timestamp << ");";
+        exec(ss.str());
+    }
+
+    // Constants
+    // If memory usage is too high, try reducing the batch size to 25,000.
+    // If  I/O is the bottleneck, try increasing the batch size to 100,000.
+    // If doing a lot of random access queries, smaller batches might help.
+
+    int yoda = 0;
+
+    /*
+    Attempt to use pure parquet API - don't work
+
+    void database_hybrid::write_to_parquet(
+        const std::vector<std::tuple<uint64_t, uint64_t, int, uint64_t, std::string>>& transactions
+    ) {
+        std::lock_guard<std::mutex> lock(m_parquet_mutex);
+        std::cout << "[Thread " << std::this_thread::get_id()
+                  << "] Entering write_to_parquet() batch #" << ++yoda
+                  << " | Transactions: " << transactions.size() << std::endl << std::flush;
+
+        if (transactions.empty()) {
+            std::cerr << "Warning: Empty transaction batch passed to Parquet writer." << std::endl;
+            return;
+        }
+
+        // 1️⃣ Define Parquet schema
+        std::shared_ptr<parquet::schema::GroupNode> schema =
+            std::static_pointer_cast<parquet::schema::GroupNode>(
+                parquet::schema::GroupNode::Make("schema", parquet::Repetition::REQUIRED, {
+                    parquet::schema::PrimitiveNode::Make("obj", parquet::Repetition::REQUIRED, parquet::Type::INT64),
+                    parquet::schema::PrimitiveNode::Make("timestamp", parquet::Repetition::REQUIRED, parquet::Type::INT64),
+                    parquet::schema::PrimitiveNode::Make("direction", parquet::Repetition::REQUIRED, parquet::Type::INT32),
+                    parquet::schema::PrimitiveNode::Make("protocol", parquet::Repetition::REQUIRED, parquet::Type::INT64),
+                    parquet::schema::PrimitiveNode::Make("payload", parquet::Repetition::REQUIRED, parquet::Type::BYTE_ARRAY)
+                })
+            );
+
+        // 2️⃣ Define Parquet properties
+        parquet::WriterProperties::Builder props_builder;
+        std::shared_ptr<parquet::WriterProperties> writer_props = props_builder.build();
+
+        // 3️⃣ Generate filename for this batch
+        m_batch_counter++;
+        std::string file_name = OUTPUT_DIR + "batch_" + std::to_string(m_batch_counter) + ".parquet";
+
+        // 4️⃣ Open a Parquet file
+        std::shared_ptr<arrow::io::FileOutputStream> outfile;
+        PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(file_name));
+
+        std::shared_ptr<parquet::ParquetFileWriter> file_writer =
+            parquet::ParquetFileWriter::Open(outfile, schema, writer_props);
+
+        // 5️⃣ Write transactions
+        parquet::RowGroupWriter* row_group_writer = file_writer->AppendRowGroup();
+
+        auto obj_writer       = static_cast<parquet::Int64Writer*>(row_group_writer->NextColumn());
+        auto timestamp_writer = static_cast<parquet::Int64Writer*>(row_group_writer->NextColumn());
+        auto dir_writer       = static_cast<parquet::Int32Writer*>(row_group_writer->NextColumn());
+        auto protocol_writer  = static_cast<parquet::Int64Writer*>(row_group_writer->NextColumn());
+        auto payload_writer   = static_cast<parquet::ByteArrayWriter*>(row_group_writer->NextColumn());
+
+        for (const auto& [obj, timestamp, direction, proto, json] : transactions) {
+
+                int64_t obj_val = static_cast<int64_t>(obj);
+        int64_t timestamp_val = static_cast<int64_t>(timestamp);
+        int32_t direction_val = static_cast<int32_t>(direction);
+        int64_t proto_val = static_cast<int64_t>(proto);
+         uint32_t json_size = static_cast<uint32_t>(json.size());  // ✅ Fix type
+        parquet::ByteArray json_byte_array(json_size, reinterpret_cast<const uint8_t*>(json.data()));
+
+
+            obj_writer->WriteBatch(1, nullptr, nullptr, &obj_val);
+            timestamp_writer->WriteBatch(1, nullptr, nullptr, &timestamp_val);
+            dir_writer->WriteBatch(1, nullptr, nullptr, &direction_val);
+            protocol_writer->WriteBatch(1, nullptr, nullptr, &proto_val);
+
+            parquet::ByteArray byte_array;
+            byte_array.ptr = reinterpret_cast<const uint8_t*>(json.c_str());
+            byte_array.len = static_cast<uint32_t>(json.size());
+            payload_writer->WriteBatch(1, nullptr, nullptr, &byte_array);
+        }
+
+        row_group_writer->Close();
+        file_writer->Close();
+
+        std::cout << "[Thread " << std::this_thread::get_id() << "] Exiting write_to_parquet() batch #" << yoda << std::endl << std::flush;
+
+        parquet_buffer.clear();
+    }
+
+    */
+
+    void database_hybrid::write_to_parquet(const std::vector<std::tuple<uint64_t, uint64_t, int, uint64_t, std::string>> &transactions)
+    {
+        // std::lock_guard<std::mutex> lock(m_parquet_mutex);
+        m_parquet_mutex.lock();
+        std::cout << "[Thread " << std::this_thread::get_id() << "] Entering write_to_parquet()" << ++yoda << std::endl
+                  << std::flush;
+
+        if (transactions.empty())
+        {
+            std::cerr << "Warning: Empty transaction batch passed to Parquet writer." << std::endl;
+        }
+
+        if (!m_memory_pool)
+        {
+            std::cerr << "Fatal Error: Memory pool already destroyed." << std::endl
+                      << std::flush;
+            std::exit(1);
+        }
+
+        // Create Arrow Builders for columns
+        arrow::UInt64Builder obj_builder(m_memory_pool), timestamp_builder(m_memory_pool), proto_builder(m_memory_pool);
+        arrow::Int64Builder dir_builder;
+        arrow::StringBuilder json_builder;
+
+        void(obj_builder.Resize(PARQUET_BATCH_SIZE));
+        void(timestamp_builder.Resize(PARQUET_BATCH_SIZE));
+        void(dir_builder.Resize(PARQUET_BATCH_SIZE));
+        void(proto_builder.Resize(PARQUET_BATCH_SIZE));
+        void(json_builder.Resize(PARQUET_BATCH_SIZE));
+
+        // Append data to Arrow builders
+        for (const auto &[obj, timestamp, direction, proto, json] : transactions)
+        {
+            auto res = obj_builder.Append(obj);
+            if (!res.ok())
+            {
+                std::cout << "Arrow builder obj append failed!!" << std::endl
+                          << std::flush;
+            }
+            res = timestamp_builder.Append(timestamp);
+            if (!res.ok())
+            {
+                std::cout << "Arrow builder timestamp append failed!!" << std::endl
+                          << std::flush;
+            }
+            res = dir_builder.Append(direction);
+            if (!res.ok())
+            {
+                std::cout << "Arrow builder direction append failed!!" << std::endl
+                          << std::flush;
+            }
+            res = proto_builder.Append(proto);
+            if (!res.ok())
+            {
+                std::cout << "Arrow builder proto append failed!!" << std::endl
+                          << std::flush;
+            }
+            res = json_builder.Append(json);
+            if (!res.ok())
+            {
+                std::cout << "Arrow builder json  append failed!!" << std::endl
+                          << std::flush;
+            }
+        }
+
+        // Create Arrow arrays
+        std::shared_ptr<arrow::Array> obj_array, timestamp_array, dir_array, proto_array, json_array;
+
+        auto res = obj_builder.Finish(&obj_array);
+        if (!res.ok())
+        {
+            std::cout << "Arrow builder obj array append failed!!" << std::endl
+                      << std::flush;
+        }
+
+        res = timestamp_builder.Finish(&timestamp_array);
+        if (!res.ok())
+        {
+            std::cout << "Arrow builder timestamp array append failed!!" << std::endl
+                      << std::flush;
+        }
+
+        res = dir_builder.Finish(&dir_array);
+        if (!res.ok())
+        {
+            std::cout << "Arrow builder dir array  append failed!!" << std::endl
+                      << std::flush;
+        }
+
+        res = proto_builder.Finish(&proto_array);
+        if (!res.ok())
+        {
+            std::cout << "Arrow builder proto array  append failed!!" << std::endl
+                      << std::flush;
+        }
+
+        res = json_builder.Finish(&json_array);
+        if (!res.ok())
+        {
+            std::cout << "Arrow builder json array append failed!!" << std::endl
+                      << std::flush;
+        }
+
+        // Define schema
+        auto schema = arrow::schema({arrow::field("obj", arrow::uint64()),
+                                     arrow::field("timestamp", arrow::uint64()),
+                                     arrow::field("direction", arrow::int64()),
+                                     arrow::field("protocol", arrow::uint64()),
+                                     arrow::field("payload", arrow::utf8())});
+
+        // Create table
+        auto table = arrow::Table::Make(schema, {obj_array, timestamp_array, dir_array, proto_array, json_array});
+
+        // 🔹 Generate a unique filename for each batch
+        m_batch_counter++; // Increment batch number
+
+        // Write to Parquet file with batch numbering
+        std::string file_name = OUTPUT_DIR + "batch_" + std::to_string(m_batch_counter) + ".parquet";
+        std::shared_ptr<arrow::io::FileOutputStream> outfile;
+        PARQUET_ASSIGN_OR_THROW(outfile, arrow::io::FileOutputStream::Open(file_name));
+        int rgs = 64 * 1024;
+        PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(*table, m_memory_pool, outfile, rgs));
+        parquet_buffer.clear();
+        m_parquet_mutex.unlock();
+        // std::cout << "Written " << transactions.size() << " transactions to " << file_name << std::endl;
+
+        std::cout << "[Thread " << std::this_thread::get_id() << "] exiting write_to_parquet() " << yoda << std::endl
+                  << std::flush;
+    }
+
+    void database_hybrid::process_transaction(uint64_t obj, uint64_t timestamp, int direction, uint64_t proto, const std::string &json)
+    {
+        parquet_buffer.emplace_back(obj, timestamp, direction, proto, json);
+
+        if (parquet_buffer.size() >= PARQUET_BATCH_SIZE)
+        {
+            write_to_parquet(parquet_buffer);
+        }
+    }
+
+    void database_hybrid::flush_parquet_buffer()
+    {
+        if (!parquet_buffer.empty())
+        {
+            std::cout << "flush_parquet_buffer called by thread " << std::this_thread::get_id() << std::endl
+                      << std::flush;
+            std::cout << "Trying to write " << parquet_buffer.size() << " transactions" << std::endl
+                      << std::flush;
+            write_to_parquet(parquet_buffer);
+        }
+    }
+
+    void database_hybrid::transaction_trace_fw(id_t obj, sysc_time_t st, protocol_kind proto, const char *json)
+    {
+        m_stmt_insert_transaction.bind(1, st);
+        m_stmt_insert_transaction.bind(2, obj);
+        m_stmt_insert_transaction.bind(3, 0ull);  // Direction (fw = 0)
+        m_stmt_insert_transaction.bind(4, proto); // Fix: Bind only 4 values
+        m_stmt_insert_transaction.execute();
+
+        // Send to Parquet buffer
+        process_transaction(obj, st, 0, proto, json);
+    }
+
+    void database_hybrid::transaction_trace_bw(id_t obj, sysc_time_t st, protocol_kind proto, const char *json)
+    {
+        m_stmt_insert_transaction.bind(1, st);
+        m_stmt_insert_transaction.bind(2, obj);
+        m_stmt_insert_transaction.bind(3, 1ull);
+        m_stmt_insert_transaction.bind(4, proto);
+
+        // We won't write the json anymore
+        // m_stmt_insert_transaction.bind(5, json);
+        m_stmt_insert_transaction.execute();
+
+        process_transaction(obj, st, 1, proto, json);
+    }
+
+    database_hybrid::database_hybrid(const std::string &options) : database(options),
+                                                                   m_db(),
+                                                                   m_stmt_tx_begin(m_db, "BEGIN IMMEDIATE TRANSACTION;"),
+                                                                   m_stmt_tx_end(m_db, "END TRANSACTION;"),
+                                                                   m_stmt_insert_transaction(m_db, "INSERT INTO transactions (st, port, dir, proto) VALUES (?1, ?2, ?3, ?4)"), m_memory_pool(arrow::default_memory_pool())
+    {
+
+        m_batch_counter = 1;
+    }
+
+    void database_hybrid::stop()
+    {
+        {
+            std::lock_guard<std::mutex> lock(m_mtx); // 🔒 Ensure thread safety
+            if (!m_running)
+                return; // Avoid duplicate calls
+            m_running = false;
+        }
+
+        m_cv.notify_all(); // Wake up any waiting worker threads
+
+        if (m_worker.joinable())
+        {
+            std::cout << "[STOP] Joining worker thread now..." << std::endl
+                      << std::flush;
+            m_worker.join();
+            std::cout << "[STOP] Worker thread has exited." << std::endl
+                      << std::flush;
+        }
+        else
+        {
+            std::cout << "[STOP] Worker thread not joinable, may already be stopped." << std::endl
+                      << std::flush;
+        }
+
+        // 🚀 Ensure all transactions are written before shutdown
+        // std::cout << "Final flush of parquet buffer before shutdown..." << std::endl << std::flush;
+        // flush_parquet_buffer();
+
+        // std::cout << "All database threads stopped safely, all transactions written to Parquet." << std::endl << std::flush;
+    }
+
+    database_hybrid::~database_hybrid()
+    {
+        std::cout << "In database hybrid destructor" << std::endl
+                  << std::flush;
+        std::cout << "Destructor called by thread " << std::this_thread::get_id() << std::endl
+                  << std::flush;
+
+        // flush_parquet_buffer();  // Ensure all transactions are written before shutdown
+
+        // 🚀 Ensure all transactions are written before shutdown
+        std::cout << "Final flush of parquet buffer before shutdown..." << std::endl
+                  << std::flush;
+        flush_parquet_buffer();
+
+        std::cout << "Calling stop" << std::endl
+                  << std::flush;
+
+        stop();
+
+        m_memory_pool = nullptr;
+
+        std::cout << "Leaving Destructor called by thread " << std::this_thread::get_id() << std::endl
+                  << std::flush;
+    }
+
+} // namespace inscight
