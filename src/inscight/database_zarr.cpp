@@ -5,7 +5,7 @@
  *                                                                            *
  ******************************************************************************/
 
-#include <z5/types/types.hxx>
+#include <z5/factory.hxx>
 #include "inscight/database_zarr.h"
 
 #include <iostream>
