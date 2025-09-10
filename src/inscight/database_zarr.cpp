@@ -5,7 +5,7 @@
  *                                                                            *
  ******************************************************************************/
 
-#include <z5/z5.hxx>
+#include <z5/types/types.hxx>
 #include "inscight/database_zarr.h"
 
 #include <iostream>
@@ -16,6 +16,9 @@ namespace inscight
     void database_zarr::init()
     {
         std::cout << "[database_zarr] init()" << std::endl;
+        z5::types::Shape probe_shape; // usually an empty std::vector<std::size_t>
+        std::cout << "[database_zarr] z5 ok: z5::types::Shape available, size="
+                  << probe_shape.size() << std::endl;
     }
 
     void database_zarr::gen_meta(const meta_info &info)
