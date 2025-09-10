@@ -5,6 +5,7 @@
  *                                                                            *
  ******************************************************************************/
 
+#include <z5/z5.hxx>
 #include "inscight/database_zarr.h"
 
 #include <iostream>
