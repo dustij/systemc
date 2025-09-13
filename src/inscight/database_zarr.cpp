@@ -46,15 +46,15 @@ namespace inscight
         std::vector<size_t> shape = {10000}; // Start with 10k entries, can grow dynamically
         std::vector<size_t> chunks = {1000};
         
-        // Create or open string datasets for commands and response statuses
+        // Create or open datasets using supported data types
         try {
-            commandDs = z5::createDataset(f, "commands", "S32", shape, chunks); // 32-char strings
+            commandDs = z5::createDataset(f, "commands", "uint8", {10000, 32}, {1000, 32}); // 32-byte strings as uint8 arrays
         } catch (const std::invalid_argument&) {
             commandDs = z5::openDataset(f, "commands");
         }
 
         try {
-            responseDs = z5::createDataset(f, "responses", "S64", shape, chunks); // 64-char strings
+            responseDs = z5::createDataset(f, "responses", "uint8", {10000, 64}, {1000, 64}); // 64-byte strings as uint8 arrays
         } catch (const std::invalid_argument&) {
             responseDs = z5::openDataset(f, "responses");
         }
@@ -117,22 +117,27 @@ namespace inscight
             response.resize(63, '\0'); // S64 means 64 chars including null terminator
 
             // Write data to zarr datasets at current entry position
-            z5::types::ShapeType offset = {entryCount};
-            z5::types::ShapeType singleShape = {1};
+            z5::types::ShapeType cmd_offset = {entryCount, 0};
+            z5::types::ShapeType resp_offset = {entryCount, 0};
+            z5::types::ShapeType ts_offset = {entryCount};
 
             // Create properly sized arrays and copy data
-            xt::xarray<char> cmdArray = xt::zeros<char>({32});
-            xt::xarray<char> respArray = xt::zeros<char>({64});
+            xt::xarray<uint8_t> cmdArray = xt::zeros<uint8_t>({1, 32});
+            xt::xarray<uint8_t> respArray = xt::zeros<uint8_t>({1, 64});
             xt::xarray<uint64_t> tsArray = xt::zeros<uint64_t>({1});
 
-            // Copy string data into arrays
-            std::copy(command.begin(), command.end(), cmdArray.begin());
-            std::copy(response.begin(), response.end(), respArray.begin());
+            // Copy string data into arrays (convert char to uint8_t)
+            for (size_t i = 0; i < command.size() && i < 32; ++i) {
+                cmdArray(0, i) = static_cast<uint8_t>(command[i]);
+            }
+            for (size_t i = 0; i < response.size() && i < 64; ++i) {
+                respArray(0, i) = static_cast<uint8_t>(response[i]);
+            }
             tsArray[0] = static_cast<uint64_t>(timestamp);
 
-            z5::multiarray::writeSubarray<char>(*commandDs, cmdArray, offset.begin());
-            z5::multiarray::writeSubarray<char>(*responseDs, respArray, offset.begin());
-            z5::multiarray::writeSubarray<uint64_t>(*timestampDs, tsArray, offset.begin());
+            z5::multiarray::writeSubarray<uint8_t>(*commandDs, cmdArray, cmd_offset.begin());
+            z5::multiarray::writeSubarray<uint8_t>(*responseDs, respArray, resp_offset.begin());
+            z5::multiarray::writeSubarray<uint64_t>(*timestampDs, tsArray, ts_offset.begin());
             
             std::cout << "[database_zarr] " << direction << " stored entry " << entryCount 
                       << ": cmd=" << command.c_str() << " resp=" << response.c_str() 
@@ -152,19 +157,31 @@ namespace inscight
         }
 
         try {
-            z5::types::ShapeType offset = {index};
+            z5::types::ShapeType cmd_offset = {index, 0};
+            z5::types::ShapeType resp_offset = {index, 0};
+            z5::types::ShapeType ts_offset = {index};
 
             // Create properly sized zero-initialized arrays
-            xt::xarray<char> cmdArray = xt::zeros<char>({32});
-            xt::xarray<char> respArray = xt::zeros<char>({64});
+            xt::xarray<uint8_t> cmdArray = xt::zeros<uint8_t>({1, 32});
+            xt::xarray<uint8_t> respArray = xt::zeros<uint8_t>({1, 64});
             xt::xarray<uint64_t> tsArray = xt::zeros<uint64_t>({1});
 
-            z5::multiarray::readSubarray<char>(*commandDs, cmdArray, offset.begin());
-            z5::multiarray::readSubarray<char>(*responseDs, respArray, offset.begin());
-            z5::multiarray::readSubarray<uint64_t>(*timestampDs, tsArray, offset.begin());
-            
-            std::cout << "[database_zarr] Retrieved entry " << index 
-                      << ": cmd=" << cmdArray.data() << " resp=" << respArray.data() 
+            z5::multiarray::readSubarray<uint8_t>(*commandDs, cmdArray, cmd_offset.begin());
+            z5::multiarray::readSubarray<uint8_t>(*responseDs, respArray, resp_offset.begin());
+            z5::multiarray::readSubarray<uint64_t>(*timestampDs, tsArray, ts_offset.begin());
+
+            // Convert uint8_t back to strings for display
+            std::string cmdStr(reinterpret_cast<const char*>(cmdArray.data()), 32);
+            std::string respStr(reinterpret_cast<const char*>(respArray.data()), 64);
+
+            // Find null terminator to truncate strings properly
+            auto cmdNull = cmdStr.find('\0');
+            if (cmdNull != std::string::npos) cmdStr = cmdStr.substr(0, cmdNull);
+            auto respNull = respStr.find('\0');
+            if (respNull != std::string::npos) respStr = respStr.substr(0, respNull);
+
+            std::cout << "[database_zarr] Retrieved entry " << index
+                      << ": cmd=" << cmdStr << " resp=" << respStr
                       << " ts=" << tsArray[0] << std::endl;
         } catch (const std::exception& e) {
             std::cerr << "[database_zarr] Error retrieving transaction data: " << e.what() << std::endl;
