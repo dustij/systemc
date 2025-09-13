@@ -32,21 +32,40 @@ namespace inscight
         z5::filesystem::handle::File f("transaction_data.zr");
         std::cout << "[database_zarr] get handle to a File on the filesystem" << std::endl;
 
-        // create the file in zarr format
+        // create the file in zarr format, or open if it already exists
         const bool createAsZarr = true;
-        z5::createFile(f, createAsZarr);
-        std::cout << "[database_zarr] create the file in zarr format" << std::endl;
+        try {
+            z5::createFile(f, createAsZarr);
+            std::cout << "[database_zarr] created new file in zarr format" << std::endl;
+        } catch (const std::invalid_argument& e) {
+            // File already exists, that's okay - we'll just use the existing file
+            std::cout << "[database_zarr] using existing zarr file" << std::endl;
+        }
 
         // create datasets for command and response_status
         std::vector<size_t> shape = {10000}; // Start with 10k entries, can grow dynamically
         std::vector<size_t> chunks = {1000};
         
-        // Create string datasets for commands and response statuses
-        commandDs = z5::createDataset(f, "commands", "S32", shape, chunks); // 32-char strings
-        responseDs = z5::createDataset(f, "responses", "S64", shape, chunks); // 64-char strings
-        timestampDs = z5::createDataset(f, "timestamps", "uint64", shape, chunks);
+        // Create or open string datasets for commands and response statuses
+        try {
+            commandDs = z5::createDataset(f, "commands", "S32", shape, chunks); // 32-char strings
+        } catch (const std::invalid_argument&) {
+            commandDs = z5::openDataset(f, "commands");
+        }
 
-        std::cout << "[database_zarr] created datasets for commands, responses, and timestamps" << std::endl;
+        try {
+            responseDs = z5::createDataset(f, "responses", "S64", shape, chunks); // 64-char strings
+        } catch (const std::invalid_argument&) {
+            responseDs = z5::openDataset(f, "responses");
+        }
+
+        try {
+            timestampDs = z5::createDataset(f, "timestamps", "uint64", shape, chunks);
+        } catch (const std::invalid_argument&) {
+            timestampDs = z5::openDataset(f, "timestamps");
+        }
+
+        std::cout << "[database_zarr] opened/created datasets for commands, responses, and timestamps" << std::endl;
     }
 
     void database_zarr::gen_meta(const meta_info &info)
