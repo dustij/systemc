@@ -118,11 +118,18 @@ namespace inscight
 
             // Write data to zarr datasets at current entry position
             z5::types::ShapeType offset = {entryCount};
-            
-            xt::xarray<char> cmdArray = xt::adapt(command.c_str(), {32});
-            xt::xarray<char> respArray = xt::adapt(response.c_str(), {64});
-            xt::xarray<uint64_t> tsArray = {static_cast<uint64_t>(timestamp)};
-            
+            z5::types::ShapeType singleShape = {1};
+
+            // Create properly sized arrays and copy data
+            xt::xarray<char> cmdArray = xt::zeros<char>({32});
+            xt::xarray<char> respArray = xt::zeros<char>({64});
+            xt::xarray<uint64_t> tsArray = xt::zeros<uint64_t>({1});
+
+            // Copy string data into arrays
+            std::copy(command.begin(), command.end(), cmdArray.begin());
+            std::copy(response.begin(), response.end(), respArray.begin());
+            tsArray[0] = static_cast<uint64_t>(timestamp);
+
             z5::multiarray::writeSubarray<char>(*commandDs, cmdArray, offset.begin());
             z5::multiarray::writeSubarray<char>(*responseDs, respArray, offset.begin());
             z5::multiarray::writeSubarray<uint64_t>(*timestampDs, tsArray, offset.begin());
@@ -146,11 +153,12 @@ namespace inscight
 
         try {
             z5::types::ShapeType offset = {index};
-            
-            xt::xarray<char> cmdArray({32});
-            xt::xarray<char> respArray({64});
-            xt::xarray<uint64_t> tsArray({1});
-            
+
+            // Create properly sized zero-initialized arrays
+            xt::xarray<char> cmdArray = xt::zeros<char>({32});
+            xt::xarray<char> respArray = xt::zeros<char>({64});
+            xt::xarray<uint64_t> tsArray = xt::zeros<uint64_t>({1});
+
             z5::multiarray::readSubarray<char>(*commandDs, cmdArray, offset.begin());
             z5::multiarray::readSubarray<char>(*responseDs, respArray, offset.begin());
             z5::multiarray::readSubarray<uint64_t>(*timestampDs, tsArray, offset.begin());
