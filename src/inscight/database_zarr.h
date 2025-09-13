@@ -11,15 +11,32 @@
 
 #include <string>
 #include <iostream>
+#include <nlohmann/json.hpp>
 
 #include "inscight/entry.h"
 #include "inscight/database.h"
+
+// z5 includes for Zarr functionality
+#include "z5/factory.hxx"
+#include "z5/filesystem/handle.hxx"
+#include "z5/multiarray/xtensor_access.hxx"
+#include "z5/attributes.hxx"
 
 namespace inscight
 {
 
     class database_zarr : public database
     {
+    private:
+        // Zarr datasets for storing transaction data
+        z5::Dataset commandDs;
+        z5::Dataset responseDs;
+        z5::Dataset timestampDs;
+        size_t entryCount;
+
+        // Helper methods
+        void storeTransactionData(sysc_time_t timestamp, const nlohmann::json& j, const std::string& direction);
+
     protected:
         virtual void init() override;
         virtual void begin(size_t) override {}
@@ -75,6 +92,9 @@ namespace inscight
     public:
         database_zarr(const std::string &options) : database(options) {}
         virtual ~database_zarr();
+        
+        // Public method to retrieve stored transaction data
+        void retrieveTransactionData(size_t index);
     };
 
 } // namespace inscight
