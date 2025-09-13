@@ -5,6 +5,9 @@
  *                                                                            *
  ******************************************************************************/
 
+#include "json.hpp"
+#include "xtensor/xarray.hpp"
+
 // factory functions to create files, groups and datasets
 #include "z5/factory.hxx"
 // handles for z5 filesystem objects
@@ -82,18 +85,18 @@ namespace inscight
 
     void database_zarr::transaction_trace_fw(id_t obj, sysc_time_t st, protocol_kind proto, const char *json)
     {
-        std::cout << "[database_zarr] FW: st=" << st
-                  << " obj=" << obj
-                  << " proto=" << protocol_str(proto)
-                  << " json=\"" << (json ? json : "") << "\"" << std::endl;
+        // std::cout << "[database_zarr] FW: st=" << st
+        //           << " obj=" << obj
+        //           << " proto=" << protocol_str(proto)
+        //           << " json=\"" << (json ? json : "") << "\"" << std::endl;
     }
 
     void database_zarr::transaction_trace_bw(id_t obj, sysc_time_t st, protocol_kind proto, const char *json)
     {
-        std::cout << "[database_zarr] BW: st=" << st
-                  << " obj=" << obj
-                  << " proto=" << protocol_str(proto)
-                  << " json=\"" << (json ? json : "") << "\"" << std::endl;
+        // std::cout << "[database_zarr] BW: st=" << st
+        //           << " obj=" << obj
+        //           << " proto=" << protocol_str(proto)
+        //           << " json=\"" << (json ? json : "") << "\"" << std::endl;
     }
 
     database_zarr::~database_zarr()
