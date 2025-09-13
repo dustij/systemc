@@ -11,6 +11,7 @@
 
 #include <string>
 #include <iostream>
+#include <memory>
 #include <nlohmann/json.hpp>
 
 #include "inscight/entry.h"
@@ -29,9 +30,9 @@ namespace inscight
     {
     private:
         // Zarr datasets for storing transaction data
-        z5::Dataset commandDs;
-        z5::Dataset responseDs;
-        z5::Dataset timestampDs;
+        std::unique_ptr<z5::Dataset> commandDs;
+        std::unique_ptr<z5::Dataset> responseDs;
+        std::unique_ptr<z5::Dataset> timestampDs;
         size_t entryCount;
 
         // Helper methods
@@ -90,7 +91,7 @@ namespace inscight
         virtual void handle_irq_event(id_t, real_time_t, sysc_time_t, size_t, irq_event) override {}
 
     public:
-        database_zarr(const std::string &options) : database(options) {}
+        database_zarr(const std::string &options) : database(options), entryCount(0) {}
         virtual ~database_zarr();
         
         // Public method to retrieve stored transaction data

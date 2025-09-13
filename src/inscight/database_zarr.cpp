@@ -45,10 +45,8 @@ namespace inscight
         commandDs = z5::createDataset(f, "commands", "S32", shape, chunks); // 32-char strings
         responseDs = z5::createDataset(f, "responses", "S64", shape, chunks); // 64-char strings
         timestampDs = z5::createDataset(f, "timestamps", "uint64", shape, chunks);
-        
+
         std::cout << "[database_zarr] created datasets for commands, responses, and timestamps" << std::endl;
-        
-        entryCount = 0;
     }
 
     void database_zarr::gen_meta(const meta_info &info)
@@ -106,9 +104,9 @@ namespace inscight
             xt::xarray<char> respArray = xt::adapt(response.c_str(), {64});
             xt::xarray<uint64_t> tsArray = {static_cast<uint64_t>(timestamp)};
             
-            z5::multiarray::writeSubarray<char>(commandDs, cmdArray, offset.begin());
-            z5::multiarray::writeSubarray<char>(responseDs, respArray, offset.begin());
-            z5::multiarray::writeSubarray<uint64_t>(timestampDs, tsArray, offset.begin());
+            z5::multiarray::writeSubarray<char>(*commandDs, cmdArray, offset.begin());
+            z5::multiarray::writeSubarray<char>(*responseDs, respArray, offset.begin());
+            z5::multiarray::writeSubarray<uint64_t>(*timestampDs, tsArray, offset.begin());
             
             std::cout << "[database_zarr] " << direction << " stored entry " << entryCount 
                       << ": cmd=" << command.c_str() << " resp=" << response.c_str() 
@@ -134,9 +132,9 @@ namespace inscight
             xt::xarray<char> respArray({64});
             xt::xarray<uint64_t> tsArray({1});
             
-            z5::multiarray::readSubarray<char>(commandDs, cmdArray, offset.begin());
-            z5::multiarray::readSubarray<char>(responseDs, respArray, offset.begin());
-            z5::multiarray::readSubarray<uint64_t>(timestampDs, tsArray, offset.begin());
+            z5::multiarray::readSubarray<char>(*commandDs, cmdArray, offset.begin());
+            z5::multiarray::readSubarray<char>(*responseDs, respArray, offset.begin());
+            z5::multiarray::readSubarray<uint64_t>(*timestampDs, tsArray, offset.begin());
             
             std::cout << "[database_zarr] Retrieved entry " << index 
                       << ": cmd=" << cmdArray.data() << " resp=" << respArray.data() 
