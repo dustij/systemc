@@ -9,13 +9,13 @@
 #include <xtensor/containers/xarray.hpp>
 
 // factory functions to create files, groups and datasets
-#include "z5/factory.hxx"
+#include <z5/factory.hxx>
 // handles for z5 filesystem objects
-#include "z5/filesystem/handle.hxx"
+#include <z5/filesystem/handle.hxx>
 // io for xtensor multi-arrays
-#include "z5/multiarray/xtensor_access.hxx"
+#include <z5/multiarray/xtensor_access.hxx>
 // attribute functionality
-#include "z5/attributes.hxx"
+#include <z5/attributes.hxx>
 
 #include "inscight/database_zarr.h"
 
@@ -29,7 +29,7 @@ namespace inscight
         std::cout << "[database_zarr] init()" << std::endl;
 
         // get handle to a File on the filesystem
-        z5::filesystem::handle::File f("transaction_data.zr");
+        z5::filesystem::handle::File f("data.zr");
         std::cout << "[database_zarr] get handle to a File on the filesystem" << std::endl;
 
         // create the file in zarr format, or open if it already exists
