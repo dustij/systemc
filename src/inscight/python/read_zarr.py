@@ -1,14 +1,22 @@
 import zarr
 import os
+import sys
 
-# Check if data.zr exists
-if not os.path.exists('../../data.zr'):
-    print("[python.read_zarr] Error: data.zr not found")
+# Get path from command line argument
+if len(sys.argv) != 2:
+    print("[python.read_zarr] Usage: python read_zarr.py <path_to_zarr>")
+    exit(1)
+
+zarr_path = sys.argv[1]
+
+# Check if zarr file exists
+if not os.path.exists(zarr_path):
+    print(f"[python.read_zarr] Error: {zarr_path} not found")
     exit(1)
 
 try:
     # Try to open zarr store with different approaches
-    store = zarr.open('../../data.zr', mode='r')
+    store = zarr.open(zarr_path, mode='r')
     print(f"[python.read_zarr] Successfully opened zarr store")
 
     # Try to get keys safely
@@ -37,7 +45,7 @@ except Exception as e:
     print("[python.read_zarr] Trying with zarr v2 compatibility...")
     try:
         import zarr
-        store = zarr.open_group('../../data.zr', mode='r')
+        store = zarr.open_group(zarr_path, mode='r')
         print(f"[python.read_zarr] Opened as group, keys: {list(store.keys())}")
     except Exception as e2:
         print(f"[python.read_zarr] Also failed as group: {e2}")
