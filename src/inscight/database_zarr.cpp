@@ -46,21 +46,21 @@ namespace inscight
         std::vector<size_t> shape = {10000}; // Start with 10k entries, can grow dynamically
         std::vector<size_t> chunks = {1000};
         
-        // Create or open datasets using supported data types
+        // Create or open datasets using supported data types with correct fill values
         try {
-            commandDs = z5::createDataset(f, "commands", "uint8", {10000, 32}, {1000, 32}); // 32-byte strings as uint8 arrays
+            commandDs = z5::createDataset(f, "commands", "uint8", {10000, 32}, {1000, 32}, 0); // 32-byte strings as uint8 arrays
         } catch (const std::invalid_argument&) {
             commandDs = z5::openDataset(f, "commands");
         }
 
         try {
-            responseDs = z5::createDataset(f, "responses", "uint8", {10000, 64}, {1000, 64}); // 64-byte strings as uint8 arrays
+            responseDs = z5::createDataset(f, "responses", "uint8", {10000, 64}, {1000, 64}, 0); // 64-byte strings as uint8 arrays
         } catch (const std::invalid_argument&) {
             responseDs = z5::openDataset(f, "responses");
         }
 
         try {
-            timestampDs = z5::createDataset(f, "timestamps", "uint64", shape, chunks);
+            timestampDs = z5::createDataset(f, "timestamps", "uint64", shape, chunks, 0ULL);
         } catch (const std::invalid_argument&) {
             timestampDs = z5::openDataset(f, "timestamps");
         }
