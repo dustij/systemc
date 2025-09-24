@@ -46,21 +46,33 @@ namespace inscight
         std::vector<size_t> shape = {10000}; // Start with 10k entries, can grow dynamically
         std::vector<size_t> chunks = {1000};
         
-        // Create or open datasets using supported data types with correct fill values
+        // Create or open datasets using supported data types
         try {
-            commandDs = z5::createDataset(f, "commands", "uint8", {10000, 32}, {1000, 32}, 0); // 32-byte strings as uint8 arrays
+            commandDs = z5::createDataset(f, "commands", "uint8", {10000, 32}, {1000, 32}); // 32-byte strings as uint8 arrays
+            // Set integer fill value using attributes
+            nlohmann::json attrs;
+            attrs["fill_value"] = 0;
+            z5::writeAttributes(*commandDs, attrs);
         } catch (const std::invalid_argument&) {
             commandDs = z5::openDataset(f, "commands");
         }
 
         try {
-            responseDs = z5::createDataset(f, "responses", "uint8", {10000, 64}, {1000, 64}, 0); // 64-byte strings as uint8 arrays
+            responseDs = z5::createDataset(f, "responses", "uint8", {10000, 64}, {1000, 64}); // 64-byte strings as uint8 arrays
+            // Set integer fill value using attributes
+            nlohmann::json attrs;
+            attrs["fill_value"] = 0;
+            z5::writeAttributes(*responseDs, attrs);
         } catch (const std::invalid_argument&) {
             responseDs = z5::openDataset(f, "responses");
         }
 
         try {
-            timestampDs = z5::createDataset(f, "timestamps", "uint64", shape, chunks, 0ULL);
+            timestampDs = z5::createDataset(f, "timestamps", "uint64", shape, chunks);
+            // Set integer fill value using attributes
+            nlohmann::json attrs;
+            attrs["fill_value"] = 0;
+            z5::writeAttributes(*timestampDs, attrs);
         } catch (const std::invalid_argument&) {
             timestampDs = z5::openDataset(f, "timestamps");
         }
