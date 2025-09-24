@@ -48,31 +48,34 @@ namespace inscight
         
         // Create or open datasets using supported data types
         try {
-            commandDs = z5::createDataset(f, "commands", "uint8", {10000, 32}, {1000, 32}); // 32-byte strings as uint8 arrays
+            auto commandHandle = z5::filesystem::handle::Dataset(f, "commands");
+            commandDs = z5::createDataset(commandHandle, "uint8", {10000, 32}, {1000, 32});
             // Set integer fill value using attributes
             nlohmann::json attrs;
             attrs["fill_value"] = 0;
-            z5::writeAttributes(*commandDs, attrs);
+            z5::writeAttributes(commandHandle, attrs);
         } catch (const std::invalid_argument&) {
             commandDs = z5::openDataset(f, "commands");
         }
 
         try {
-            responseDs = z5::createDataset(f, "responses", "uint8", {10000, 64}, {1000, 64}); // 64-byte strings as uint8 arrays
+            auto responseHandle = z5::filesystem::handle::Dataset(f, "responses");
+            responseDs = z5::createDataset(responseHandle, "uint8", {10000, 64}, {1000, 64});
             // Set integer fill value using attributes
             nlohmann::json attrs;
             attrs["fill_value"] = 0;
-            z5::writeAttributes(*responseDs, attrs);
+            z5::writeAttributes(responseHandle, attrs);
         } catch (const std::invalid_argument&) {
             responseDs = z5::openDataset(f, "responses");
         }
 
         try {
-            timestampDs = z5::createDataset(f, "timestamps", "uint64", shape, chunks);
+            auto timestampHandle = z5::filesystem::handle::Dataset(f, "timestamps");
+            timestampDs = z5::createDataset(timestampHandle, "uint64", shape, chunks);
             // Set integer fill value using attributes
             nlohmann::json attrs;
             attrs["fill_value"] = 0;
-            z5::writeAttributes(*timestampDs, attrs);
+            z5::writeAttributes(timestampHandle, attrs);
         } catch (const std::invalid_argument&) {
             timestampDs = z5::openDataset(f, "timestamps");
         }
