@@ -20,9 +20,40 @@
 #include "inscight/database_zarr.h"
 
 #include <iostream>
+#include <fstream>
 
 namespace inscight
 {
+    // Helper function to fix zarr metadata fill_value from float to integer
+    void fixZarrMetadata(const std::string& metadataPath) {
+        std::ifstream inFile(metadataPath);
+        if (!inFile.is_open()) {
+            std::cerr << "[database_zarr] Warning: Could not open " << metadataPath << " for reading" << std::endl;
+            return;
+        }
+
+        nlohmann::json metadata;
+        try {
+            inFile >> metadata;
+            inFile.close();
+
+            // Fix fill_value from 0.0 to 0 for integer types
+            if (metadata.contains("fill_value") && metadata["fill_value"] == 0.0) {
+                metadata["fill_value"] = 0;
+
+                std::ofstream outFile(metadataPath);
+                if (outFile.is_open()) {
+                    outFile << metadata.dump(4) << std::endl;
+                    outFile.close();
+                    std::cout << "[database_zarr] Fixed fill_value in " << metadataPath << std::endl;
+                } else {
+                    std::cerr << "[database_zarr] Warning: Could not write to " << metadataPath << std::endl;
+                }
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "[database_zarr] Error fixing metadata " << metadataPath << ": " << e.what() << std::endl;
+        }
+    }
 
     void database_zarr::init()
     {
@@ -48,34 +79,25 @@ namespace inscight
         
         // Create or open datasets using supported data types
         try {
-            auto commandHandle = z5::filesystem::handle::Dataset(f, "commands");
-            commandDs = z5::createDataset(commandHandle, "uint8", {10000, 32}, {1000, 32});
-            // Set integer fill value using attributes
-            nlohmann::json attrs;
-            attrs["fill_value"] = 0;
-            z5::writeAttributes(commandHandle, attrs);
+            commandDs = z5::createDataset(f, "commands", "uint8", {10000, 32}, {1000, 32}); // 32-byte strings as uint8 arrays
+            // Fix fill_value in metadata file
+            fixZarrMetadata("data.zr/commands/.zarray");
         } catch (const std::invalid_argument&) {
             commandDs = z5::openDataset(f, "commands");
         }
 
         try {
-            auto responseHandle = z5::filesystem::handle::Dataset(f, "responses");
-            responseDs = z5::createDataset(responseHandle, "uint8", {10000, 64}, {1000, 64});
-            // Set integer fill value using attributes
-            nlohmann::json attrs;
-            attrs["fill_value"] = 0;
-            z5::writeAttributes(responseHandle, attrs);
+            responseDs = z5::createDataset(f, "responses", "uint8", {10000, 64}, {1000, 64}); // 64-byte strings as uint8 arrays
+            // Fix fill_value in metadata file
+            fixZarrMetadata("data.zr/responses/.zarray");
         } catch (const std::invalid_argument&) {
             responseDs = z5::openDataset(f, "responses");
         }
 
         try {
-            auto timestampHandle = z5::filesystem::handle::Dataset(f, "timestamps");
-            timestampDs = z5::createDataset(timestampHandle, "uint64", shape, chunks);
-            // Set integer fill value using attributes
-            nlohmann::json attrs;
-            attrs["fill_value"] = 0;
-            z5::writeAttributes(timestampHandle, attrs);
+            timestampDs = z5::createDataset(f, "timestamps", "uint64", shape, chunks);
+            // Fix fill_value in metadata file
+            fixZarrMetadata("data.zr/timestamps/.zarray");
         } catch (const std::invalid_argument&) {
             timestampDs = z5::openDataset(f, "timestamps");
         }
