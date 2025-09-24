@@ -2,6 +2,23 @@ import zarr
 import os
 import sys
 
+# This is for exploring the current zarr dataset
+# It assumes keys = timestamps, responses, and commands
+# This may not work later if we make changes
+def start_exploring():
+    print("Lets dig into this a bit...")
+    user_input = input("Choose: timestamps, responses, commands")
+
+    match (user_input):
+        case "timestamps":
+            pass
+        case "responses":
+            pass
+        case "commands":
+            pass
+
+# ========================================================================
+
 # Get path from command line argument
 if len(sys.argv) != 2:
     print("[python.read_zarr] Usage: python read_zarr.py <path_to_zarr>")
@@ -33,6 +50,12 @@ try:
             # Print first few values if array is small
             if array.size <= 10:
                 print(f"[python.read_zarr] {key} data: {array[...]}")
+            
+            # =====================
+            # Interactive exploration
+            # =====================
+            start_exploring()
+
         except Exception as e:
             print(f"[python.read_zarr] Error reading array '{key}': {e}")
 
