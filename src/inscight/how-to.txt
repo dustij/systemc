@@ -1,0 +1,14 @@
+to build after making changes (do this NOT in a conda env):
+make -f ~/Dev/scripts/makebuild
+
+to run:
+doit
+
+to activate conda env:
+conda activate z5-dev
+
+run python script (do this in the z5-dev conda env and from ~/Dev/avp64/build/vcml/systemc-src/src/inscight):
+python python/read_zarr.py data.zr
+
+set env to use zarr
+export INSCIGHT=zarr

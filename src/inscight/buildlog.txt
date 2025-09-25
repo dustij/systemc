@@ -1,0 +1,511 @@
+cd /home/dusti/Dev/avp64/build; cmake -DAVP64_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/opt/avp64 -DCMAKE_BUILD_TYPE=Release ..
+-- Writing version avp64-2025.08.22-7677a70-dirty
+-- Writing version vcml-2025.08.29-c2f8b45
+-- Writing version mwr-2025.08.29-2b5feb0
+-- Using libelf for reading ELF files
+-- Enable copyright message
+-- Enable VCD scopes
+-- Enable SystemC assertions
+-- Disable pthreads
+-- SystemC target arch linuxaarch64
+-- SystemC language version 3.0.1
+-- SystemC TLM version 2.0.6
+-- Disable SystemC unity build
+-- Enable InSCight support
+-- Could NOT find Lua (missing: LUA_LIBRARIES LUA_INCLUDE_DIR) (Required is at least version "5.3")
+-- Could NOT find LibUSB (missing: LIBUSB_INCLUDE_DIRS LIBUSB_LIBRARIES) (found version "")
+-- Disable VCML unity build
+-- Building with SDL2 support
+-- Building with SLIRP support
+-- Building with TAP support
+-- Building with SOCKETCAN support
+-- Building without LUA support
+-- Building without LibUSB support
+-- Found CAPSTONE at /home/dusti/Dev/avp64/build/ocx-qemu-arm-avp64-src/capstone
+-- Found OCX at /home/dusti/Dev/avp64/build/ocx-qemu-arm-avp64-src/ocx
+-- Found UNICORN at /home/dusti/Dev/avp64/build/ocx-qemu-arm-avp64-src/unicorn
+-- Using UNICORN debug: no
+-- PROJECT_VERSION: 5.0.6 CAPSTONE_VERSION: 5.0.6
+Enabling CAPSTONE_ARM_SUPPORT
+Enabling CAPSTONE_ARM64_SUPPORT
+-- Found Python: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+-- Could NOT find OCX_QEMU_ARM (missing: OCX_QEMU_ARM_INCLUDE_DIRS) (found version "0.0.0")
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/dusti/Dev/avp64/build
+cd /home/dusti/Dev/avp64/build; make -j12
+make[1]: Entering directory '/home/dusti/Dev/avp64/build'
+make[2]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[  0%] Creating directories for 'unicorn-build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+[  0%] Building CXX object ocx-qemu-arm/ocx/CMakeFiles/ocx-dummy-core.dir/src/dummy-core.cpp.o
+[  1%] Building CXX object ocx-qemu-arm/ocx/googletest/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+[  2%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/cs.c.o
+[  2%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/Mapping.c.o
+[  2%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/MCInstrDesc.c.o
+[  2%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/MCInst.c.o
+[  3%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/MCRegisterInfo.c.o
+[  3%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/utils.c.o
+[  3%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/SStream.c.o
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+[  3%] No download step for 'unicorn-build'
+[  3%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/core/utils.cpp.o
+[  4%] No update step for 'unicorn-build'
+[  5%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/arch/ARM/ARMDisassembler.c.o
+[  5%] No patch step for 'unicorn-build'
+[  5%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/arch/ARM/ARMInstPrinter.c.o
+[  5%] No configure step for 'unicorn-build'
+[  5%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/core/report.cpp.o
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[  6%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/core/bitops.cpp.o
+[  6%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/arch/ARM/ARMMapping.c.o
+[  6%] Performing build step for 'unicorn-build'
+make[4]: Entering directory '/home/dusti/Dev/avp64/build/ocx-qemu-arm-avp64-src/unicorn'
+make[4]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[  6%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/stl/strings.cpp.o
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+[  6%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_clock.cpp.o
+make[4]: Leaving directory '/home/dusti/Dev/avp64/build/ocx-qemu-arm-avp64-src/unicorn'
+[  8%] No install step for 'unicorn-build'
+[  9%] Completed 'unicorn-build'
+[  9%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/stl/threads.cpp.o
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[ 10%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_event_finder.cpp.o
+[ 10%] Built target unicorn-build
+[ 11%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/arch/ARM/ARMModule.c.o
+[ 12%] Linking CXX shared module libocx-dummy.so
+[ 12%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/arch/AArch64/AArch64BaseInfo.c.o
+[ 12%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/arch/AArch64/AArch64Disassembler.c.o
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[ 12%] Built target ocx-dummy-core
+[ 12%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/logging/publisher.cpp.o
+[ 13%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/logging/publishers/file.cpp.o
+[ 13%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/logging/publishers/stream.cpp.o
+[ 13%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/arch/AArch64/AArch64InstPrinter.c.o
+[ 13%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/logging/publishers/terminal.cpp.o
+[ 15%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/arch/AArch64/AArch64Mapping.c.o
+[ 16%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/logging/logger.cpp.o
+[ 16%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_event_queue.cpp.o
+[ 16%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/fdt.cpp.o
+[ 16%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_export.cpp.o
+[ 16%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/license.cpp.o
+[ 16%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/modules.cpp.o
+[ 16%] Building C object ocx-qemu-arm/capstone/CMakeFiles/capstone.dir/arch/AArch64/AArch64Module.c.o
+[ 17%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/options.cpp.o
+[ 17%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_interface.cpp.o
+[ 17%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/srec.cpp.o
+[ 18%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_mutex.cpp.o
+[ 18%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/ihex.cpp.o
+[ 18%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_port.cpp.o
+[ 18%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/uimage.cpp.o
+[ 19%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/terminal.cpp.o
+[ 19%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/aio_posix.cpp.o
+[ 19%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_prim_channel.cpp.o
+[ 20%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/library_posix.cpp.o
+[ 20%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/memory_posix.cpp.o
+[ 22%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_semaphore.cpp.o
+[ 22%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/socket_posix.cpp.o
+[ 22%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/subprocess_posix.cpp.o
+[ 23%] Building CXX object vcml/mwr/CMakeFiles/mwr.dir/src/mwr/utils/elf_libelf.cpp.o
+[ 23%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_signal.cpp.o
+[ 23%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_signal_ports.cpp.o
+[ 23%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_signal_resolved.cpp.o
+[ 24%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/communication/sc_signal_resolved_ports.cpp.o
+[ 24%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/bit/sc_bit.cpp.o
+[ 24%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/bit/sc_bv_base.cpp.o
+[ 25%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/bit/sc_logic.cpp.o
+[ 25%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/bit/sc_lv_base.cpp.o
+[ 25%] Linking CXX static library libmwr.a
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[ 25%] Built target mwr
+[ 25%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/fx/sc_fxcast_switch.cpp.o
+[ 26%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/fx/sc_fxdefs.cpp.o
+[ 26%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/fx/sc_fxnum.cpp.o
+[ 26%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/fx/sc_fxnum_observer.cpp.o
+[ 26%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/fx/sc_fxtype_params.cpp.o
+[ 27%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/fx/sc_fxval.cpp.o
+[ 27%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/fx/sc_fxval_observer.cpp.o
+[ 27%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/fx/scfx_mant.cpp.o
+[ 29%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/fx/scfx_pow10.cpp.o
+[ 29%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/fx/scfx_rep.cpp.o
+[ 29%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/fx/scfx_utils.cpp.o
+[ 29%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/int/sc_int64_io.cpp.o
+[ 30%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/int/sc_int64_mask.cpp.o
+[ 30%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/int/sc_int_base.cpp.o
+[ 30%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/int/sc_length_param.cpp.o
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[ 30%] Built target capstone
+[ 31%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/int/sc_nbutils.cpp.o
+[ 31%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/int/sc_signed.cpp.o
+[ 31%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/int/sc_uint_base.cpp.o
+[ 32%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/int/sc_unsigned.cpp.o
+[ 32%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/datatypes/misc/sc_value_base.cpp.o
+[ 32%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_attribute.cpp.o
+[ 32%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_cor_fiber.cpp.o
+[ 33%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_cor_pthread.cpp.o
+[ 33%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_cor_qt.cpp.o
+[ 33%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_cthread_process.cpp.o
+[ 34%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_event.cpp.o
+[ 34%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_except.cpp.o
+[ 34%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_join.cpp.o
+[ 34%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_method_process.cpp.o
+[ 36%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_module.cpp.o
+[ 36%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_module_name.cpp.o
+[ 36%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_module_registry.cpp.o
+[ 37%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_name_gen.cpp.o
+[ 37%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_object.cpp.o
+[ 38%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_stage_callback_registry.cpp.o
+[ 38%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_object_manager.cpp.o
+[ 38%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_process.cpp.o
+[ 38%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_reset.cpp.o
+[ 38%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_sensitive.cpp.o
+[ 39%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_simcontext.cpp.o
+[ 39%] Linking CXX static library ../../../../lib/libgtest.a
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[ 39%] Built target gtest
+[ 39%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_spawn_options.cpp.o
+[ 39%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_thread_process.cpp.o
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+[ 39%] Building CXX object ocx-qemu-arm/ocx/googletest/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+[ 40%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_time.cpp.o
+[ 41%] Building CXX object ocx-qemu-arm/ocx/googletest/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o
+[ 41%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_ver.cpp.o
+[ 41%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_wait.cpp.o
+[ 41%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_wait_cthread.cpp.o
+[ 43%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/tracing/sc_trace.cpp.o
+[ 43%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/tracing/sc_trace_file_base.cpp.o
+[ 43%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/tracing/sc_vcd_trace.cpp.o
+[ 44%] Linking CXX static library ../../../../lib/libgtest_main.a
+[ 45%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/tracing/sc_wif_trace.cpp.o
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[ 45%] Built target gtest_main
+[ 45%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/utils/sc_hash.cpp.o
+[ 45%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/utils/sc_list.cpp.o
+[ 46%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/utils/sc_mempool.cpp.o
+[ 46%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/utils/sc_pq.cpp.o
+[ 46%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/utils/sc_report.cpp.o
+[ 46%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/utils/sc_report_handler.cpp.o
+[ 47%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/utils/sc_stop_here.cpp.o
+[ 47%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/utils/sc_utils_ids.cpp.o
+[ 47%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/utils/sc_vector.cpp.o
+[ 48%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/tlm_core/tlm_2/tlm_generic_payload/tlm_gp.cpp.o
+[ 48%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/tlm_core/tlm_2/tlm_generic_payload/tlm_phase.cpp.o
+[ 48%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/tlm_core/tlm_2/tlm_quantum/tlm_global_quantum.cpp.o
+[ 48%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/tlm_utils/convenience_socket_bases.cpp.o
+[ 50%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/tlm_utils/instance_specific_extensions.cpp.o
+[ 50%] Building C object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/packages/qt/qt.c.o
+[ 50%] Building ASM object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/packages/qt/md/aarch64.s.o
+[ 51%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_main.cpp.o
+[ 51%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/sysc/kernel/sc_main_main.cpp.o
+[ 51%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/inscight/entry.cpp.o
+[ 52%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/inscight/database.cpp.o
+[ 52%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/inscight/database_csv.cpp.o
+[ 52%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/inscight/database_sql.cpp.o
+[ 52%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/inscight/database_zarr.cpp.o
+[ 53%] Building CXX object vcml/systemc/src/CMakeFiles/systemc.dir/inscight/context.cpp.o
+[ 53%] Building C object vcml/systemc/src/CMakeFiles/systemc.dir/inscight/sqlite/sqlite3.c.o
+[ 53%] Linking CXX static library ../../../../lib/libgmock.a
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[ 53%] Built target gmock
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+[ 54%] Building CXX object ocx-qemu-arm/ocx/CMakeFiles/ocx-test-runner.dir/src/test-runner.cpp.o
+[ 54%] Linking CXX executable ocx-test-runner
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[ 54%] Built target ocx-test-runner
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+[ 54%] Building CXX object ocx-qemu-arm/CMakeFiles/ocx-qemu-arm.dir/src/modeldb.cpp.o
+[ 54%] Building CXX object ocx-qemu-arm/CMakeFiles/ocx-qemu-arm.dir/src/armcore.cpp.o
+[ 54%] Linking CXX shared module libocx-qemu-arm.so
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[ 54%] Built target ocx-qemu-arm
+In file included from /usr/include/c++/13/algorithm:60,
+                 from /home/dusti/miniconda3/include/nlohmann/json.hpp:21,
+                 from /home/dusti/Dev/avp64/build/vcml/systemc-src/src/inscight/database_zarr.cpp:8:
+In static member function ‘static _Up* std::__copy_move<_IsMove, true, std::random_access_iterator_tag>::__copy_m(_Tp*, _Tp*, _Up*) [with _Tp = long unsigned int; _Up = long unsigned int; bool _IsMove = false]’,
+    inlined from ‘_OI std::__copy_move_a2(_II, _II, _OI) [with bool _IsMove = false; _II = long unsigned int*; _OI = long unsigned int*]’ at /usr/include/c++/13/bits/stl_algobase.h:506:30,
+    inlined from ‘_OI std::__copy_move_a1(_II, _II, _OI) [with bool _IsMove = false; _II = long unsigned int*; _OI = long unsigned int*]’ at /usr/include/c++/13/bits/stl_algobase.h:533:42,
+    inlined from ‘_OI std::__copy_move_a(_II, _II, _OI) [with bool _IsMove = false; _II = __gnu_cxx::__normal_iterator<long unsigned int*, vector<long unsigned int> >; _OI = long unsigned int*]’ at /usr/include/c++/13/bits/stl_algobase.h:540:31,
+    inlined from ‘_OI std::copy(_II, _II, _OI) [with _II = __gnu_cxx::__normal_iterator<long unsigned int*, vector<long unsigned int> >; _OI = long unsigned int*]’ at /usr/include/c++/13/bits/stl_algobase.h:633:7,
+    inlined from ‘static _ForwardIterator std::__uninitialized_copy<true>::__uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<long unsigned int*, std::vector<long unsigned int> >; _ForwardIterator = long unsigned int*]’ at /usr/include/c++/13/bits/stl_uninitialized.h:147:27,
+    inlined from ‘_ForwardIterator std::uninitialized_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<long unsigned int*, vector<long unsigned int> >; _ForwardIterator = long unsigned int*]’ at /usr/include/c++/13/bits/stl_uninitialized.h:185:15,
+    inlined from ‘_ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<long unsigned int*, vector<long unsigned int> >; _ForwardIterator = long unsigned int*; _Tp = long unsigned int]’ at /usr/include/c++/13/bits/stl_uninitialized.h:373:37,
+    inlined from ‘void std::vector<_Tp, _Alloc>::_M_range_initialize(_ForwardIterator, _ForwardIterator, std::forward_iterator_tag) [with _ForwardIterator = __gnu_cxx::__normal_iterator<long unsigned int*, std::vector<long unsigned int> >; _Tp = long unsigned int; _Alloc = std::allocator<long unsigned int>]’ at /usr/include/c++/13/bits/stl_vector.h:1695:33,
+    inlined from ‘std::vector<_Tp, _Alloc>::vector(_InputIterator, _InputIterator, const allocator_type&) [with _InputIterator = __gnu_cxx::__normal_iterator<long unsigned int*, std::vector<long unsigned int> >; <template-parameter-2-2> = void; _Tp = long unsigned int; _Alloc = std::allocator<long unsigned int>]’ at /usr/include/c++/13/bits/stl_vector.h:711:23,
+    inlined from ‘void z5::multiarray::writeSubarray(const z5::Dataset&, const xt::xexpression<E2>&, ITER, int) [with T = long unsigned int; ARRAY = xt::xarray_container<xt::uvector<long unsigned int, std::allocator<long unsigned int> >, xt::layout_type::row_major, xt::svector<long unsigned int, 4, std::allocator<long unsigned int>, true>, xt::xtensor_expression_tag>; ITER = __gnu_cxx::__normal_iterator<long unsigned int*, std::vector<long unsigned int> >]’ at /home/dusti/.local/include/z5/multiarray/xtensor_access.hxx:485:26,
+    inlined from ‘void inscight::database_zarr::storeTransactionData(inscight::sysc_time_t, const nlohmann::json_abi_v3_11_2::json&, const std::string&)’ at /home/dusti/Dev/avp64/build/vcml/systemc-src/src/inscight/database_zarr.cpp:177:52:
+/usr/include/c++/13/bits/stl_algobase.h:437:30: warning: ‘void* __builtin_memcpy(void*, const void*, long unsigned int)’ forming offset 8 is out of the bounds [0, 8] [-Warray-bounds=]
+  437 |             __builtin_memmove(__result, __first, sizeof(_Tp) * _Num);
+      |             ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In static member function ‘static _Up* std::__copy_move<_IsMove, true, std::random_access_iterator_tag>::__copy_m(_Tp*, _Tp*, _Up*) [with _Tp = long unsigned int; _Up = long unsigned int; bool _IsMove = false]’,
+    inlined from ‘_OI std::__copy_move_a2(_II, _II, _OI) [with bool _IsMove = false; _II = long unsigned int*; _OI = long unsigned int*]’ at /usr/include/c++/13/bits/stl_algobase.h:506:30,
+    inlined from ‘_OI std::__copy_move_a1(_II, _II, _OI) [with bool _IsMove = false; _II = long unsigned int*; _OI = long unsigned int*]’ at /usr/include/c++/13/bits/stl_algobase.h:533:42,
+    inlined from ‘_OI std::__copy_move_a(_II, _II, _OI) [with bool _IsMove = false; _II = __gnu_cxx::__normal_iterator<long unsigned int*, vector<long unsigned int> >; _OI = long unsigned int*]’ at /usr/include/c++/13/bits/stl_algobase.h:540:31,
+    inlined from ‘_OI std::copy(_II, _II, _OI) [with _II = __gnu_cxx::__normal_iterator<long unsigned int*, vector<long unsigned int> >; _OI = long unsigned int*]’ at /usr/include/c++/13/bits/stl_algobase.h:633:7,
+    inlined from ‘static _ForwardIterator std::__uninitialized_copy<true>::__uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<long unsigned int*, std::vector<long unsigned int> >; _ForwardIterator = long unsigned int*]’ at /usr/include/c++/13/bits/stl_uninitialized.h:147:27,
+    inlined from ‘_ForwardIterator std::uninitialized_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<long unsigned int*, vector<long unsigned int> >; _ForwardIterator = long unsigned int*]’ at /usr/include/c++/13/bits/stl_uninitialized.h:185:15,
+    inlined from ‘_ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<long unsigned int*, vector<long unsigned int> >; _ForwardIterator = long unsigned int*; _Tp = long unsigned int]’ at /usr/include/c++/13/bits/stl_uninitialized.h:373:37,
+    inlined from ‘void std::vector<_Tp, _Alloc>::_M_range_initialize(_ForwardIterator, _ForwardIterator, std::forward_iterator_tag) [with _ForwardIterator = __gnu_cxx::__normal_iterator<long unsigned int*, std::vector<long unsigned int> >; _Tp = long unsigned int; _Alloc = std::allocator<long unsigned int>]’ at /usr/include/c++/13/bits/stl_vector.h:1695:33,
+    inlined from ‘std::vector<_Tp, _Alloc>::vector(_InputIterator, _InputIterator, const allocator_type&) [with _InputIterator = __gnu_cxx::__normal_iterator<long unsigned int*, std::vector<long unsigned int> >; <template-parameter-2-2> = void; _Tp = long unsigned int; _Alloc = std::allocator<long unsigned int>]’ at /usr/include/c++/13/bits/stl_vector.h:711:23,
+    inlined from ‘void z5::multiarray::readSubarray(const z5::Dataset&, xt::xexpression<E2>&, ITER, int) [with T = long unsigned int; ARRAY = xt::xarray_container<xt::uvector<long unsigned int, std::allocator<long unsigned int> >, xt::layout_type::row_major, xt::svector<long unsigned int, 4, std::allocator<long unsigned int>, true>, xt::xtensor_expression_tag>; ITER = __gnu_cxx::__normal_iterator<long unsigned int*, std::vector<long unsigned int> >]’ at /home/dusti/.local/include/z5/multiarray/xtensor_access.hxx:260:26,
+    inlined from ‘void inscight::database_zarr::retrieveTransactionData(size_t)’ at /home/dusti/Dev/avp64/build/vcml/systemc-src/src/inscight/database_zarr.cpp:208:51:
+/usr/include/c++/13/bits/stl_algobase.h:437:30: warning: ‘void* __builtin_memcpy(void*, const void*, long unsigned int)’ forming offset 8 is out of the bounds [0, 8] [-Warray-bounds=]
+  437 |             __builtin_memmove(__result, __first, sizeof(_Tp) * _Num);
+      |             ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[ 54%] Linking CXX static library libsystemc.a
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[ 54%] Built target systemc
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+[ 54%] Building CXX object vcml/CMakeFiles/vcml-main.dir/src/vcml/core/main.cpp.o
+[ 55%] Linking CXX static library libvcml-main.a
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[ 55%] Built target vcml-main
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+[ 55%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/core/systemc.cpp.o
+[ 55%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/core/types.cpp.o
+[ 56%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/core/module.cpp.o
+[ 56%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/core/component.cpp.o
+[ 56%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/core/register.cpp.o
+[ 56%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/core/peripheral.cpp.o
+[ 58%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/core/processor.cpp.o
+[ 58%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/core/system.cpp.o
+[ 58%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/core/setup.cpp.o
+[ 58%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/logging/inscight.cpp.o
+[ 59%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/core/model.cpp.o
+[ 59%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/logging/logger.cpp.o
+[ 59%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/tracing/protocol.cpp.o
+[ 60%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/tracing/tracer.cpp.o
+[ 60%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/tracing/tracer_file.cpp.o
+[ 60%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/tracing/tracer_term.cpp.o
+[ 61%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/tracing/tracer_inscight.cpp.o
+[ 61%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/properties/property_base.cpp.o
+[ 61%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/properties/broker.cpp.o
+[ 62%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/properties/broker_arg.cpp.o
+[ 62%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/properties/broker_env.cpp.o
+[ 62%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/properties/broker_file.cpp.o
+[ 62%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/debugging/symtab.cpp.o
+[ 63%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/debugging/target.cpp.o
+[ 63%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/debugging/loader.cpp.o
+[ 63%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/debugging/subscriber.cpp.o
+[ 65%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/debugging/suspender.cpp.o
+[ 65%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/debugging/rspserver.cpp.o
+[ 65%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/debugging/gdbarch.cpp.o
+[ 65%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/debugging/gdbserver.cpp.o
+[ 66%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/debugging/vspserver.cpp.o
+[ 66%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/ui/video.cpp.o
+[ 66%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/ui/keymap.cpp.o
+[ 67%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/ui/input.cpp.o
+[ 67%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/ui/display.cpp.o
+[ 67%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/ui/console.cpp.o
+[ 68%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/ui/vnc.cpp.o
+[ 68%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/audio/format.cpp.o
+[ 68%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/audio/driver.cpp.o
+[ 68%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/audio/driver_wav.cpp.o
+[ 69%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/audio/stream.cpp.o
+[ 69%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/audio/istream.cpp.o
+[ 69%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/audio/ostream.cpp.o
+[ 70%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/tlm_sbi.cpp.o
+[ 70%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/tlm_exmon.cpp.o
+[ 70%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/tlm_dmi_cache.cpp.o
+[ 70%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/tlm_stubs.cpp.o
+[ 72%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/tlm_host.cpp.o
+[ 72%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/tlm_sockets.cpp.o
+[ 72%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/tlm_probe.cpp.o
+[ 73%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/gpio.cpp.o
+[ 73%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/clk.cpp.o
+[ 73%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/spi.cpp.o
+[ 74%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/sd.cpp.o
+[ 74%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/i2c.cpp.o
+[ 74%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/lin.cpp.o
+[ 74%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/pci.cpp.o
+[ 75%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/eth.cpp.o
+[ 75%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/can.cpp.o
+[ 75%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/usb_types.cpp.o
+[ 76%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/usb_sockets.cpp.o
+[ 76%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/serial.cpp.o
+[ 76%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/signal.cpp.o
+[ 76%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/virtio.cpp.o
+[ 77%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/generic/clock.cpp.o
+[ 77%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/generic/reset.cpp.o
+[ 77%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/generic/bus.cpp.o
+[ 79%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/generic/memory.cpp.o
+[ 79%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/generic/hwrng.cpp.o
+[ 79%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/generic/fbdev.cpp.o
+[ 80%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/gpio/leds.cpp.o
+[ 80%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/gpio/gate.cpp.o
+[ 80%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/gpio/mmgpio.cpp.o
+[ 80%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/gpio/sifive.cpp.o
+[ 81%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/gpio/pl061.cpp.o
+[ 81%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/backend_null.cpp.o
+[ 81%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/backend_fd.cpp.o
+[ 82%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/backend_file.cpp.o
+[ 82%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/backend_tcp.cpp.o
+[ 82%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/backend_term.cpp.o
+[ 82%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/backend_tui.cpp.o
+[ 83%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/backend.cpp.o
+[ 83%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/terminal.cpp.o
+[ 83%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/uart.cpp.o
+[ 84%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/pl011.cpp.o
+[ 84%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/nrf51.cpp.o
+[ 84%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/cdns.cpp.o
+[ 86%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/sifive.cpp.o
+[ 86%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/serial/uartlite.cpp.o
+[ 86%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/timers/rtc1742.cpp.o
+[ 87%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/timers/sp804.cpp.o
+[ 87%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/timers/nrf51.cpp.o
+[ 87%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/timers/pl031.cpp.o
+[ 87%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/block/backend_file.cpp.o
+[ 88%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/block/backend_ram.cpp.o
+[ 88%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/block/backend.cpp.o
+[ 88%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/block/disk.cpp.o
+[ 88%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/block/scsi.cpp.o
+[ 89%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/ethernet/backend.cpp.o
+[ 89%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/ethernet/backend_file.cpp.o
+[ 89%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/ethernet/bridge.cpp.o
+[ 90%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/ethernet/network.cpp.o
+[ 90%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/ethernet/lan9118.cpp.o
+[ 90%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/ethernet/ethoc.cpp.o
+[ 91%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/can/backend.cpp.o
+[ 91%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/can/backend_file.cpp.o
+[ 91%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/can/backend_tcp.cpp.o
+[ 91%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/can/bridge.cpp.o
+[ 93%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/can/bus.cpp.o
+[ 93%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/can/m_can.cpp.o
+[ 93%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/i2c/lm75.cpp.o
+[ 94%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/i2c/ads1015.cpp.o
+[ 94%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/i2c/oci2c.cpp.o
+[ 94%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/lin/network.cpp.o
+[ 94%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/i2c/sifive.cpp.o
+[ 95%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/lin/gateway.cpp.o
+[ 95%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/spi/bus.cpp.o
+[ 95%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/spi/spi2sd.cpp.o
+[ 96%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/spi/max31855.cpp.o
+[ 96%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/spi/mcp3208.cpp.o
+[ 96%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/spi/flash.cpp.o
+[ 97%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/spi/ocspi.cpp.o
+[ 97%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/spi/sifive.cpp.o
+[ 97%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/spi/pl022.cpp.o
+[ 97%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/sd/card.cpp.o
+[ 98%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/sd/sdhci.cpp.o
+[ 98%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/usb/device.cpp.o
+[ 98%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/usb/drive.cpp.o
+[100%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/usb/keyboard.cpp.o
+[100%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/usb/headset.cpp.o
+[100%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/usb/xhci.cpp.o
+[100%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/usb/xhcipci.cpp.o
+[101%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/pci/device.cpp.o
+[101%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/pci/host.cpp.o
+[101%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/pci/endpoint.cpp.o
+[102%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/virtio/mmio.cpp.o
+[102%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/virtio/pci.cpp.o
+[103%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/virtio/blk.cpp.o
+[102%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/virtio/rng.cpp.o
+[103%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/virtio/net.cpp.o
+[103%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/virtio/console.cpp.o
+[103%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/virtio/input.cpp.o
+[104%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/virtio/sound.cpp.o
+[104%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/meta/loader.cpp.o
+[104%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/meta/simdev.cpp.o
+[105%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/meta/throttle.cpp.o
+[105%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/opencores/ompic.cpp.o
+[105%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/opencores/ockbd.cpp.o
+[105%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/opencores/ocfbc.cpp.o
+[106%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/arm/pl190vic.cpp.o
+[106%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/arm/syscon.cpp.o
+[106%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/arm/gic400.cpp.o
+[108%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/arm/gicv2m.cpp.o
+[108%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/arm/arch_timer.cpp.o
+[108%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/dma/pl330.cpp.o
+[109%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/riscv/clint.cpp.o
+[109%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/riscv/plic.cpp.o
+[109%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/riscv/aclint.cpp.o
+[109%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/riscv/aplic.cpp.o
+[110%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/riscv/iommu.cpp.o
+[110%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/riscv/simdev.cpp.o
+[110%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/protocols/tlm_memory_posix.cpp.o
+[111%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/ui/sdl.cpp.o
+[111%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/ui/icon.cpp.o
+[111%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/audio/driver_sdl.cpp.o
+[111%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/ethernet/backend_slirp.cpp.o
+[112%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/ethernet/backend_tap.cpp.o
+[112%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/can/backend_socket.cpp.o
+[112%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/properties/broker_nolua.cpp.o
+[113%] Building CXX object vcml/CMakeFiles/vcml.dir/src/vcml/models/usb/hostdev_nolibusb.cpp.o
+[113%] Linking CXX static library libvcml.a
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[113%] Built target vcml
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+[113%] Building CXX object CMakeFiles/avp64.dir/src/avp64/core.cpp.o
+[113%] Building CXX object CMakeFiles/avp64.dir/src/avp64/cpu.cpp.o
+[113%] Linking CXX static library libavp64.a
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[113%] Built target avp64
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[3]: Entering directory '/home/dusti/Dev/avp64/build'
+[115%] Building CXX object CMakeFiles/avp64-runner.dir/src/avp64/system.cpp.o
+[115%] Building CXX object CMakeFiles/avp64-runner.dir/src/avp64/main.cpp.o
+[115%] Linking CXX executable avp64-runner
+make[3]: Leaving directory '/home/dusti/Dev/avp64/build'
+[115%] Built target avp64-runner
+make[2]: Leaving directory '/home/dusti/Dev/avp64/build'
+make[1]: Leaving directory '/home/dusti/Dev/avp64/build'
+cd /home/dusti/Dev/avp64/build; sudo make install
+[ 31%] Built target systemc
+[ 39%] Built target mwr
+[ 40%] Built target vcml-main
+[ 98%] Built target vcml
+[ 98%] Built target avp64
+[100%] Built target avp64-runner
+[101%] Built target ocx-dummy-core
+[104%] Built target unicorn-build
+[110%] Built target capstone
+[111%] Built target gtest
+[112%] Built target gtest_main
+[113%] Built target gmock
+[115%] Built target ocx-test-runner
+[115%] Built target ocx-qemu-arm
+Install the project...
+-- Install configuration: "Release"
+-- Installing: /opt/avp64/lib/libavp64.a
+-- Installing: /opt/avp64/lib/libocx-qemu-arm.so
+-- Up-to-date: /opt/avp64/sw
+-- Up-to-date: /opt/avp64/sw/.gitignore
+-- Up-to-date: /opt/avp64/include
+-- Up-to-date: /opt/avp64/include/avp64.h
+-- Up-to-date: /opt/avp64/include/avp64
+-- Up-to-date: /opt/avp64/include/avp64/cpu.h
+-- Up-to-date: /opt/avp64/include/avp64/core.h
+-- Up-to-date: /opt/avp64/include
+-- Up-to-date: /opt/avp64/include/avp64
+-- Up-to-date: /opt/avp64/include/avp64/version.h
+-- Installing: /opt/avp64/bin/avp64-runner-2025.08.22
+-- Up-to-date: /opt/avp64/bin/avp64-runner

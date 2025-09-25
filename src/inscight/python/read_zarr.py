@@ -5,17 +5,57 @@ import sys
 # This is for exploring the current zarr dataset
 # It assumes keys = timestamps, responses, and commands
 # This may not work later if we make changes
-def start_exploring():
+def start_exploring(store):
     print("Lets dig into this a bit...")
-    user_input = input("Choose: timestamps, responses, commands")
 
-    match (user_input):
-        case "timestamps":
-            pass
-        case "responses":
-            pass
-        case "commands":
-            pass
+    keys = [k for k in store.keys()]
+
+    for i in range(len(keys)):
+        print(f"[{i}] {keys[i]}")
+
+    running = True;
+    while running:
+        user_input = input("Choose: ")
+        match (user_input):
+            case "0":
+                key = keys[0]
+                print(f"You chose {key}")
+                array = store[key]
+                maxRows = array.shape[0]
+                maxCols = array.shape[1]
+                rows = int(input(f"Rows (max {maxRows-1}): "))
+                cols = int(input(f"Cols (max {maxCols-1}): "))
+                if rows > maxRows - 1 or cols > maxCols - 1:
+                    print("Nope, huh uh, that's not allowed buddy")
+                    continue
+                print(array[0:rows, 0:cols])
+            case "1":
+                key = keys[1]
+                print(f"You chose {key}")
+                array = store[key]
+                maxRows = array.shape[0]
+                maxCols = array.shape[1]
+                rows = int(input(f"Rows (max {maxRows-1}): "))
+                cols = int(input(f"Cols (max {maxCols-1}): "))
+                if rows > maxRows - 1 or cols > maxCols - 1:
+                    print("Nope, huh uh, that's not allowed buddy")
+                    continue
+                print(array[0:rows, 0:cols])
+            case "2":
+                key = keys[2]
+                print(f"You chose {key}")
+                array = store[key]
+                maxRows = array.shape[0]
+                maxCols = array.shape[1]
+                rows = int(input(f"Rows (max {maxRows-1}): "))
+                cols = int(input(f"Cols (max {maxCols-1}): "))
+                if rows > maxRows - 1 or cols > maxCols - 1:
+                    print("Nope, huh uh, that's not allowed buddy")
+                    continue
+                print(array[0:rows, 0:cols])
+            case _:
+                print("Bye")
+                sys.exit(0)
 
 # ========================================================================
 
@@ -51,13 +91,11 @@ try:
             if array.size <= 10:
                 print(f"[python.read_zarr] {key} data: {array[...]}")
             
-            # =====================
-            # Interactive exploration
-            # =====================
-            start_exploring()
-
         except Exception as e:
             print(f"[python.read_zarr] Error reading array '{key}': {e}")
+            
+    # Interact and explore
+    start_exploring(store)
 
 except Exception as e:
     print(f"[python.read_zarr] Error opening as group: {e}")
