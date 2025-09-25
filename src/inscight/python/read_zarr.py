@@ -11,14 +11,24 @@ def start_exploring(store):
     keys = [k for k in store.keys()]
 
     for i in range(len(keys)):
-        print(f"[{i}] {keys[i]}")
+        print(keys[i])
 
     running = True;
     while running:
         user_input = input("Choose: ")
         match (user_input):
-            case "0":
-                key = keys[0]
+            case "timestamps":
+                key = "timestamps"
+                print(f"You chose {key}")
+                array = store[key]
+                maxRows = array.shape[0]
+                rows = int(input(f"Rows (max {maxRows-1}): "))
+                if rows > maxRows - 1:
+                    print("Nope, huh uh, that's not allowed buddy")
+                    continue
+                print(array[0:rows])
+            case "commands":
+                key = "commands"
                 print(f"You chose {key}")
                 array = store[key]
                 maxRows = array.shape[0]
@@ -29,20 +39,8 @@ def start_exploring(store):
                     print("Nope, huh uh, that's not allowed buddy")
                     continue
                 print(array[0:rows, 0:cols])
-            case "1":
-                key = keys[1]
-                print(f"You chose {key}")
-                array = store[key]
-                maxRows = array.shape[0]
-                maxCols = array.shape[1]
-                rows = int(input(f"Rows (max {maxRows-1}): "))
-                cols = int(input(f"Cols (max {maxCols-1}): "))
-                if rows > maxRows - 1 or cols > maxCols - 1:
-                    print("Nope, huh uh, that's not allowed buddy")
-                    continue
-                print(array[0:rows, 0:cols])
-            case "2":
-                key = keys[2]
+            case "responses":
+                key = "responses"
                 print(f"You chose {key}")
                 array = store[key]
                 maxRows = array.shape[0]
