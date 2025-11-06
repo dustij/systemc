@@ -73,36 +73,62 @@ namespace inscight
             std::cout << "[database_zarr] using existing zarr file" << std::endl;
         }
 
-        // create datasets for command and response_status
-        std::vector<size_t> shape = {10000}; // Start with 10k entries, can grow dynamically
+        // Create datasets matching SQLite schema
+        std::vector<size_t> shape = {10000}; // Start with 10k entries
         std::vector<size_t> chunks = {1000};
-        
+        std::vector<size_t> jsonShape = {10000, 512}; // 512-byte strings for JSON
+        std::vector<size_t> jsonChunks = {1000, 512};
+
         // Create or open datasets using supported data types
+        // id field (auto-incrementing integer)
         try {
-            commandDs = z5::createDataset(f, "commands", "uint8", {10000, 32}, {1000, 32}); // 32-byte strings as uint8 arrays
-            // Fix fill_value in metadata file
-            fixZarrMetadata("data.zr/commands/.zarray");
+            idDs = z5::createDataset(f, "id", "uint64", shape, chunks);
+            fixZarrMetadata("data.zr/id/.zarray");
         } catch (const std::invalid_argument&) {
-            commandDs = z5::openDataset(f, "commands");
+            idDs = z5::openDataset(f, "id");
         }
 
+        // st field (timestamp)
         try {
-            responseDs = z5::createDataset(f, "responses", "uint8", {10000, 64}, {1000, 64}); // 64-byte strings as uint8 arrays
-            // Fix fill_value in metadata file
-            fixZarrMetadata("data.zr/responses/.zarray");
+            stDs = z5::createDataset(f, "st", "uint64", shape, chunks);
+            fixZarrMetadata("data.zr/st/.zarray");
         } catch (const std::invalid_argument&) {
-            responseDs = z5::openDataset(f, "responses");
+            stDs = z5::openDataset(f, "st");
         }
 
+        // dir field (direction: 0=FW, 1=BW)
         try {
-            timestampDs = z5::createDataset(f, "timestamps", "uint64", shape, chunks);
-            // Fix fill_value in metadata file
-            fixZarrMetadata("data.zr/timestamps/.zarray");
+            dirDs = z5::createDataset(f, "dir", "int32", shape, chunks);
+            fixZarrMetadata("data.zr/dir/.zarray");
         } catch (const std::invalid_argument&) {
-            timestampDs = z5::openDataset(f, "timestamps");
+            dirDs = z5::openDataset(f, "dir");
         }
 
-        std::cout << "[database_zarr] opened/created datasets for commands, responses, and timestamps" << std::endl;
+        // port field (object id)
+        try {
+            portDs = z5::createDataset(f, "port", "uint64", shape, chunks);
+            fixZarrMetadata("data.zr/port/.zarray");
+        } catch (const std::invalid_argument&) {
+            portDs = z5::openDataset(f, "port");
+        }
+
+        // proto field (protocol kind)
+        try {
+            protoDs = z5::createDataset(f, "proto", "int32", shape, chunks);
+            fixZarrMetadata("data.zr/proto/.zarray");
+        } catch (const std::invalid_argument&) {
+            protoDs = z5::openDataset(f, "proto");
+        }
+
+        // json field (full JSON text)
+        try {
+            jsonDs = z5::createDataset(f, "json", "uint8", jsonShape, jsonChunks);
+            fixZarrMetadata("data.zr/json/.zarray");
+        } catch (const std::invalid_argument&) {
+            jsonDs = z5::openDataset(f, "json");
+        }
+
+        std::cout << "[database_zarr] opened/created datasets: id, st, dir, port, proto, json" << std::endl;
     }
 
     void database_zarr::gen_meta(const meta_info &info)
@@ -116,29 +142,15 @@ namespace inscight
 
     void database_zarr::transaction_trace_fw(id_t obj, sysc_time_t st, protocol_kind proto, const char *json)
     {
-        if (json && strlen(json) > 0) {
-            try {
-                nlohmann::json j = nlohmann::json::parse(json);
-                storeTransactionData(st, j, "FW");
-            } catch (const std::exception& e) {
-                std::cerr << "[database_zarr] Error parsing JSON in FW: " << e.what() << std::endl;
-            }
-        }
+        storeTransactionData(obj, st, proto, json, 0); // 0 = FW direction
     }
 
     void database_zarr::transaction_trace_bw(id_t obj, sysc_time_t st, protocol_kind proto, const char *json)
     {
-        if (json && strlen(json) > 0) {
-            try {
-                nlohmann::json j = nlohmann::json::parse(json);
-                storeTransactionData(st, j, "BW");
-            } catch (const std::exception& e) {
-                std::cerr << "[database_zarr] Error parsing JSON in BW: " << e.what() << std::endl;
-            }
-        }
+        storeTransactionData(obj, st, proto, json, 1); // 1 = BW direction
     }
 
-    void database_zarr::storeTransactionData(sysc_time_t timestamp, const nlohmann::json& j, const std::string& direction)
+    void database_zarr::storeTransactionData(id_t obj, sysc_time_t timestamp, protocol_kind proto, const char* json, int direction)
     {
         if (entryCount >= 10000) {
             std::cerr << "[database_zarr] Warning: Dataset full, cannot store more entries" << std::endl;
@@ -146,40 +158,44 @@ namespace inscight
         }
 
         try {
-            std::string command = j.contains("command") ? j["command"].get<std::string>() : "UNKNOWN";
-            std::string response = j.contains("response_status") ? j["response_status"].get<std::string>() : "UNKNOWN";
-            
-            // Pad command and response to fit dataset string sizes
-            command.resize(31, '\0'); // S32 means 32 chars including null terminator
-            response.resize(63, '\0'); // S64 means 64 chars including null terminator
+            // Prepare offset for all scalar fields
+            z5::types::ShapeType offset = {entryCount};
+            z5::types::ShapeType jsonOffset = {entryCount, 0};
 
-            // Write data to zarr datasets at current entry position
-            z5::types::ShapeType cmd_offset = {entryCount, 0};
-            z5::types::ShapeType resp_offset = {entryCount, 0};
-            z5::types::ShapeType ts_offset = {entryCount};
+            // Create arrays for each field
+            xt::xarray<uint64_t> idArray = xt::zeros<uint64_t>({1});
+            xt::xarray<uint64_t> stArray = xt::zeros<uint64_t>({1});
+            xt::xarray<int32_t> dirArray = xt::zeros<int32_t>({1});
+            xt::xarray<uint64_t> portArray = xt::zeros<uint64_t>({1});
+            xt::xarray<int32_t> protoArray = xt::zeros<int32_t>({1});
+            xt::xarray<uint8_t> jsonArray = xt::zeros<uint8_t>({1, 512});
 
-            // Create properly sized arrays and copy data
-            xt::xarray<uint8_t> cmdArray = xt::zeros<uint8_t>({1, 32});
-            xt::xarray<uint8_t> respArray = xt::zeros<uint8_t>({1, 64});
-            xt::xarray<uint64_t> tsArray = xt::zeros<uint64_t>({1});
+            // Fill in the data
+            idArray[0] = entryCount;  // Auto-incrementing ID
+            stArray[0] = static_cast<uint64_t>(timestamp);
+            dirArray[0] = direction;
+            portArray[0] = static_cast<uint64_t>(obj);
+            protoArray[0] = static_cast<int32_t>(proto);
 
-            // Copy string data into arrays (convert char to uint8_t)
-            for (size_t i = 0; i < command.size() && i < 32; ++i) {
-                cmdArray(0, i) = static_cast<uint8_t>(command[i]);
+            // Copy JSON string (or empty string if null)
+            std::string jsonStr = (json && strlen(json) > 0) ? json : "";
+            jsonStr.resize(511, '\0'); // Ensure null termination within 512 bytes
+            for (size_t i = 0; i < jsonStr.size() && i < 512; ++i) {
+                jsonArray(0, i) = static_cast<uint8_t>(jsonStr[i]);
             }
-            for (size_t i = 0; i < response.size() && i < 64; ++i) {
-                respArray(0, i) = static_cast<uint8_t>(response[i]);
-            }
-            tsArray[0] = static_cast<uint64_t>(timestamp);
 
-            z5::multiarray::writeSubarray<uint8_t>(*commandDs, cmdArray, cmd_offset.begin());
-            z5::multiarray::writeSubarray<uint8_t>(*responseDs, respArray, resp_offset.begin());
-            z5::multiarray::writeSubarray<uint64_t>(*timestampDs, tsArray, ts_offset.begin());
-            
-            std::cout << "[database_zarr] " << direction << " stored entry " << entryCount 
-                      << ": cmd=" << command.c_str() << " resp=" << response.c_str() 
-                      << " ts=" << timestamp << std::endl;
-            
+            // Write all fields
+            z5::multiarray::writeSubarray<uint64_t>(*idDs, idArray, offset.begin());
+            z5::multiarray::writeSubarray<uint64_t>(*stDs, stArray, offset.begin());
+            z5::multiarray::writeSubarray<int32_t>(*dirDs, dirArray, offset.begin());
+            z5::multiarray::writeSubarray<uint64_t>(*portDs, portArray, offset.begin());
+            z5::multiarray::writeSubarray<int32_t>(*protoDs, protoArray, offset.begin());
+            z5::multiarray::writeSubarray<uint8_t>(*jsonDs, jsonArray, jsonOffset.begin());
+
+            std::cout << "[database_zarr] " << (direction == 0 ? "FW" : "BW") << " stored entry " << entryCount
+                      << ": id=" << entryCount << " st=" << timestamp << " dir=" << direction
+                      << " port=" << obj << " proto=" << proto << std::endl;
+
             entryCount++;
         } catch (const std::exception& e) {
             std::cerr << "[database_zarr] Error storing transaction data: " << e.what() << std::endl;
@@ -194,32 +210,37 @@ namespace inscight
         }
 
         try {
-            z5::types::ShapeType cmd_offset = {index, 0};
-            z5::types::ShapeType resp_offset = {index, 0};
-            z5::types::ShapeType ts_offset = {index};
+            z5::types::ShapeType offset = {index};
+            z5::types::ShapeType jsonOffset = {index, 0};
 
-            // Create properly sized zero-initialized arrays
-            xt::xarray<uint8_t> cmdArray = xt::zeros<uint8_t>({1, 32});
-            xt::xarray<uint8_t> respArray = xt::zeros<uint8_t>({1, 64});
-            xt::xarray<uint64_t> tsArray = xt::zeros<uint64_t>({1});
+            // Create arrays to read into
+            xt::xarray<uint64_t> idArray = xt::zeros<uint64_t>({1});
+            xt::xarray<uint64_t> stArray = xt::zeros<uint64_t>({1});
+            xt::xarray<int32_t> dirArray = xt::zeros<int32_t>({1});
+            xt::xarray<uint64_t> portArray = xt::zeros<uint64_t>({1});
+            xt::xarray<int32_t> protoArray = xt::zeros<int32_t>({1});
+            xt::xarray<uint8_t> jsonArray = xt::zeros<uint8_t>({1, 512});
 
-            z5::multiarray::readSubarray<uint8_t>(*commandDs, cmdArray, cmd_offset.begin());
-            z5::multiarray::readSubarray<uint8_t>(*responseDs, respArray, resp_offset.begin());
-            z5::multiarray::readSubarray<uint64_t>(*timestampDs, tsArray, ts_offset.begin());
+            // Read all fields
+            z5::multiarray::readSubarray<uint64_t>(*idDs, idArray, offset.begin());
+            z5::multiarray::readSubarray<uint64_t>(*stDs, stArray, offset.begin());
+            z5::multiarray::readSubarray<int32_t>(*dirDs, dirArray, offset.begin());
+            z5::multiarray::readSubarray<uint64_t>(*portDs, portArray, offset.begin());
+            z5::multiarray::readSubarray<int32_t>(*protoDs, protoArray, offset.begin());
+            z5::multiarray::readSubarray<uint8_t>(*jsonDs, jsonArray, jsonOffset.begin());
 
-            // Convert uint8_t back to strings for display
-            std::string cmdStr(reinterpret_cast<const char*>(cmdArray.data()), 32);
-            std::string respStr(reinterpret_cast<const char*>(respArray.data()), 64);
+            // Convert JSON bytes back to string
+            std::string jsonStr(reinterpret_cast<const char*>(jsonArray.data()), 512);
+            auto jsonNull = jsonStr.find('\0');
+            if (jsonNull != std::string::npos) jsonStr = jsonStr.substr(0, jsonNull);
 
-            // Find null terminator to truncate strings properly
-            auto cmdNull = cmdStr.find('\0');
-            if (cmdNull != std::string::npos) cmdStr = cmdStr.substr(0, cmdNull);
-            auto respNull = respStr.find('\0');
-            if (respNull != std::string::npos) respStr = respStr.substr(0, respNull);
-
-            std::cout << "[database_zarr] Retrieved entry " << index
-                      << ": cmd=" << cmdStr << " resp=" << respStr
-                      << " ts=" << tsArray[0] << std::endl;
+            std::cout << "[database_zarr] Retrieved entry " << index << ":" << std::endl;
+            std::cout << "  id=" << idArray[0] << std::endl;
+            std::cout << "  st=" << stArray[0] << std::endl;
+            std::cout << "  dir=" << dirArray[0] << " (" << (dirArray[0] == 0 ? "FW" : "BW") << ")" << std::endl;
+            std::cout << "  port=" << portArray[0] << std::endl;
+            std::cout << "  proto=" << protoArray[0] << std::endl;
+            std::cout << "  json=" << jsonStr << std::endl;
         } catch (const std::exception& e) {
             std::cerr << "[database_zarr] Error retrieving transaction data: " << e.what() << std::endl;
         }

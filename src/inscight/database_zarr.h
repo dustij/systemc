@@ -29,14 +29,17 @@ namespace inscight
     class database_zarr : public database
     {
     private:
-        // Zarr datasets for storing transaction data
-        std::unique_ptr<z5::Dataset> commandDs;
-        std::unique_ptr<z5::Dataset> responseDs;
-        std::unique_ptr<z5::Dataset> timestampDs;
+        // Zarr datasets for storing transaction data (matching SQLite schema)
+        std::unique_ptr<z5::Dataset> idDs;         // id field
+        std::unique_ptr<z5::Dataset> stDs;         // st (timestamp) field
+        std::unique_ptr<z5::Dataset> dirDs;        // dir (direction: 0=FW, 1=BW) field
+        std::unique_ptr<z5::Dataset> portDs;       // port field
+        std::unique_ptr<z5::Dataset> protoDs;      // proto (protocol) field
+        std::unique_ptr<z5::Dataset> jsonDs;       // json (full JSON text) field
         size_t entryCount;
 
         // Helper methods
-        void storeTransactionData(sysc_time_t timestamp, const nlohmann::json& j, const std::string& direction);
+        void storeTransactionData(id_t obj, sysc_time_t timestamp, protocol_kind proto, const char* json, int direction);
 
     protected:
         virtual void init() override;

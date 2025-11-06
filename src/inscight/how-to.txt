@@ -12,3 +12,28 @@ python python/read_zarr.py data.zr
 
 set env to use zarr
 export INSCIGHT=zarr
+
+when running with zarr, data is stored in:
+data.zr (zarr format directory)
+
+set env to use sqlite
+export INSCIGHT=sqlite
+
+to verify INSCIGHT variable:
+echo $INSCIGHT
+or
+env | grep INSCIGHT
+
+NOTE: changing INSCIGHT does NOT require rebuilding - just set the env variable and re-run
+
+query first couple rows with sqlite:
+sqlite3 data.db "SELECT * FROM transactions LIMIT 5;"
+
+get all field names from sqlite:
+sqlite3 data.db "PRAGMA table_info(transactions);"
+
+or to get just the column names:
+sqlite3 data.db ".schema transactions"
+
+to ssh into utm-vm:
+ssh utm-vm

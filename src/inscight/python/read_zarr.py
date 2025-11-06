@@ -1,10 +1,10 @@
 import zarr
 import os
 import sys
+import numpy as np
 
-# This is for exploring the current zarr dataset
-# It assumes keys = timestamps, responses, and commands
-# This may not work later if we make changes
+# This is for exploring the zarr dataset
+# It now supports the full transaction schema: id, st, dir, port, proto, json
 def start_exploring(store):
     print("Lets dig into this a bit...")
 
@@ -13,44 +13,75 @@ def start_exploring(store):
     for i in range(len(keys)):
         print(keys[i])
 
-    running = True;
+    running = True
     while running:
-        user_input = input("Choose: ")
-        match (user_input):
-            case "timestamps":
-                key = "timestamps"
-                print(f"You chose {key}")
-                array = store[key]
+        user_input = input("Choose (or 'view' to see transactions): ")
+        match user_input:
+            case "id" | "st" | "port":
+                # Scalar uint64 fields
+                print(f"You chose {user_input}")
+                array = store[user_input]
                 maxRows = array.shape[0]
                 rows = int(input(f"Rows (max {maxRows-1}): "))
                 if rows > maxRows - 1:
                     print("Nope, huh uh, that's not allowed buddy")
                     continue
                 print(array[0:rows])
-            case "commands":
-                key = "commands"
-                print(f"You chose {key}")
-                array = store[key]
+            case "dir" | "proto":
+                # Scalar int32 fields
+                print(f"You chose {user_input}")
+                array = store[user_input]
                 maxRows = array.shape[0]
-                maxCols = array.shape[1]
                 rows = int(input(f"Rows (max {maxRows-1}): "))
-                cols = int(input(f"Cols (max {maxCols-1}): "))
-                if rows > maxRows - 1 or cols > maxCols - 1:
+                if rows > maxRows - 1:
                     print("Nope, huh uh, that's not allowed buddy")
                     continue
-                print(array[0:rows, 0:cols])
-            case "responses":
-                key = "responses"
-                print(f"You chose {key}")
-                array = store[key]
+                data = array[0:rows]
+                if user_input == "dir":
+                    # Show direction as FW/BW
+                    for i, val in enumerate(data):
+                        print(f"{i}: {val} ({'FW' if val == 0 else 'BW'})")
+                else:
+                    print(data)
+            case "json":
+                # String field stored as uint8 array
+                print(f"You chose {user_input}")
+                array = store[user_input]
                 maxRows = array.shape[0]
-                maxCols = array.shape[1]
                 rows = int(input(f"Rows (max {maxRows-1}): "))
-                cols = int(input(f"Cols (max {maxCols-1}): "))
-                if rows > maxRows - 1 or cols > maxCols - 1:
+                if rows > maxRows - 1:
                     print("Nope, huh uh, that's not allowed buddy")
                     continue
-                print(array[0:rows, 0:cols])
+                # Convert bytes to strings
+                for i in range(rows):
+                    raw = array[i, :]
+                    # Find null terminator and decode
+                    null_idx = np.where(raw == 0)[0]
+                    if len(null_idx) > 0:
+                        raw = raw[:null_idx[0]]
+                    json_str = bytes(raw).decode('utf-8', errors='ignore')
+                    print(f"{i}: {json_str}")
+            case "view":
+                # Display complete transactions
+                print("Viewing complete transactions")
+                rows = int(input(f"How many transactions to view? "))
+                if rows > store['id'].shape[0]:
+                    print("Too many rows requested")
+                    continue
+                for i in range(rows):
+                    print(f"\n--- Transaction {i} ---")
+                    print(f"  id:    {store['id'][i]}")
+                    print(f"  st:    {store['st'][i]}")
+                    print(f"  dir:   {store['dir'][i]} ({'FW' if store['dir'][i] == 0 else 'BW'})")
+                    print(f"  port:  {store['port'][i]}")
+                    print(f"  proto: {store['proto'][i]}")
+                    # Decode JSON string
+                    raw = store['json'][i, :]
+                    null_idx = np.where(raw == 0)[0]
+                    if len(null_idx) > 0:
+                        raw = raw[:null_idx[0]]
+                    json_str = bytes(raw).decode('utf-8', errors='ignore')
+                    print(f"  json:  {json_str}")
             case _:
                 print("Bye")
                 sys.exit(0)
