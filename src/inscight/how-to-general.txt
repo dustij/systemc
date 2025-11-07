@@ -1,45 +1,229 @@
-Working directory:
-/home/dusti/Dev/avp64/build/vcml/systemc-src/src/inscight
+=== SETUP AND ENVIRONMENT ===
 
-to build after making changes (do this NOT in a conda env):
-make -f ~/Dev/scripts/makebuild
+REQUIRED SETUP:
 
-to run:
-doit
+1. Set environment variables for your installation:
+   ```bash
+   # Add to your ~/.bashrc or ~/.profile
+   export AVP64_ROOT=/path/to/your/avp64           # Your AVP64 source directory
+   export AVP64_BUILD=${AVP64_ROOT}/build          # Build directory
+   export AVP64_INSTALL=/opt/avp64                 # Installation directory (or your preferred path)
+   export INSCIGHT_DIR=${AVP64_BUILD}/vcml/systemc-src/src/inscight
+   ```
 
-to activate conda env:
-conda activate z5-dev
+   Example for typical installation:
+   ```bash
+   export AVP64_ROOT=~/Dev/avp64
+   export AVP64_BUILD=${AVP64_ROOT}/build
+   export AVP64_INSTALL=/opt/avp64
+   export INSCIGHT_DIR=${AVP64_BUILD}/vcml/systemc-src/src/inscight
+   ```
 
-run python script (do this in the z5-dev conda env and from ~/Dev/avp64/build/vcml/systemc-src/src/inscight):
-python python/read_zarr.py data.zr
+GIT REPOSITORY SETUP (Using Custom SystemC Fork with Zarr Support):
 
-set env to use zarr
-export INSCIGHT=zarr
+This inscight implementation with Zarr support is maintained in a forked SystemC repository.
+To use this fork, you need to configure your AVP64 clone appropriately.
 
-when running with zarr, data is stored in:
-data.zr (zarr format directory)
+OPTION A: Verify if SystemC is already a submodule (most common):
 
-set env to use sqlite
-export INSCIGHT=sqlite
+1. Check if SystemC is a git submodule:
+   ```bash
+   cd ${AVP64_ROOT}
+   cat .gitmodules | grep -A2 systemc
+   # OR
+   git submodule status | grep systemc
+   ```
 
-to verify INSCIGHT variable:
+   If you see output showing a systemc submodule, it's already set up as a submodule.
+
+2. Check which SystemC repository is being used:
+   ```bash
+   cd ${AVP64_ROOT}
+   # Check submodule URL
+   git config --file .gitmodules --get submodule.systemc.url
+   # OR check the actual remote in the submodule
+   cd path/to/systemc/submodule
+   git remote -v
+   ```
+
+OPTION B: Switch to the Zarr-enabled SystemC fork:
+
+If SystemC is a submodule but pointing to the wrong repository:
+
+1. Update the submodule URL in .gitmodules:
+   ```bash
+   cd ${AVP64_ROOT}
+
+   # Edit .gitmodules and change the systemc URL to:
+   # url = git@github.com:dustij/systemc.git
+
+   # Or use git config:
+   git config --file .gitmodules submodule.systemc.url git@github.com:dustij/systemc.git
+   ```
+
+2. Sync and update the submodule:
+   ```bash
+   git submodule sync
+   git submodule update --init --recursive --remote
+   ```
+
+3. Verify the submodule is using the correct repository:
+   ```bash
+   cd path/to/systemc/submodule
+   git remote -v
+   # Should show: git@github.com:dustij/systemc.git
+   ```
+
+OPTION C: Add SystemC as a new submodule:
+
+If SystemC is NOT currently a submodule in your AVP64 repo:
+
+1. Determine where SystemC should be located:
+   ```bash
+   cd ${AVP64_ROOT}
+   # Common locations: vcml/systemc, deps/systemc, or external/systemc
+   # Check your CMakeLists.txt to find the expected path
+   grep -r "systemc" CMakeLists.txt
+   ```
+
+2. Add the SystemC fork as a submodule:
+   ```bash
+   cd ${AVP64_ROOT}
+
+   # Replace 'path/to/systemc' with the actual path from step 1
+   git submodule add git@github.com:dustij/systemc.git path/to/systemc
+   git submodule update --init --recursive
+   ```
+
+3. Commit the submodule addition:
+   ```bash
+   git add .gitmodules path/to/systemc
+   git commit -m "Add dustij/systemc fork with Zarr support"
+   ```
+
+OPTION D: Clone SystemC separately (if not using submodules):
+
+If your build system expects SystemC in a specific location but NOT as a submodule:
+
+1. Clone the SystemC fork:
+   ```bash
+   cd /path/to/expected/location
+   git clone git@github.com:dustij/systemc.git
+   cd systemc
+   git checkout main  # or the appropriate branch
+   ```
+
+2. Verify your build system can find it:
+   ```bash
+   cd ${AVP64_BUILD}
+   cmake ..
+   # Check output for SystemC path
+   ```
+
+IMPORTANT NOTES:
+
+- The Zarr-enabled inscight code is in: src/inscight/database_zarr.{h,cpp}
+- The fork includes z5 library integration for Zarr support
+- Make sure to check out the correct branch (typically 'main' or 'dev')
+- After changing submodules, always rebuild completely:
+  ```bash
+  cd ${AVP64_BUILD}
+  rm -rf *
+  cmake -DAVP64_BUILD_TESTS=OFF \
+        -DCMAKE_INSTALL_PREFIX=${AVP64_INSTALL} \
+        -DCMAKE_BUILD_TYPE=Release \
+        ..
+  make -j$(nproc)
+  sudo make install
+  ```
+
+2. Install required dependencies:
+   - CMake (for building)
+   - z5 library (for Zarr support)
+   - Python 3 with zarr package (for reading data)
+   - SQLite3 (for SQLite backend)
+
+3. Create conda environment for Python analysis:
+   ```bash
+   conda create -n zarr-env python=3.9
+   conda activate zarr-env
+   pip install zarr numpy
+   ```
+
+BUILDING:
+
+To build after making changes (do this NOT in a conda env):
+```bash
+cd ${AVP64_BUILD}
+cmake -DAVP64_BUILD_TESTS=OFF \
+      -DCMAKE_INSTALL_PREFIX=${AVP64_INSTALL} \
+      -DCMAKE_BUILD_TYPE=Release \
+      ..
+make -j$(nproc)
+sudo make install
+```
+
+Tip: Save this as a script (e.g., ~/scripts/build.sh) for convenience
+
+RUNNING SIMULATIONS:
+
+Set backend (Zarr or SQLite):
+```bash
+export INSCIGHT=zarr      # Use Zarr backend
+# OR
+export INSCIGHT=sqlite    # Use SQLite backend
+```
+
+To verify backend setting:
+```bash
 echo $INSCIGHT
-or
+# OR
 env | grep INSCIGHT
+```
 
-NOTE: changing INSCIGHT does NOT require rebuilding - just set the env variable and re-run
+NOTE: Changing INSCIGHT does NOT require rebuilding - just set the env variable and re-run
 
-query first couple rows with sqlite:
+Run simulation:
+```bash
+cd ${INSCIGHT_DIR}
+${AVP64_INSTALL}/bin/avp64-runner \
+  -f ${AVP64_INSTALL}/sw/your-config.cfg \
+  --trace-inscight \
+  -c system.trace=1 \
+  -c system.duration="100us" \
+  -c system.cpu.arm0.allow_dmi="false" \
+  -c system.cpu.arm1.allow_dmi="false" \
+  # ... (repeat for all CPUs in your system)
+```
+
+Tip: Save this as a script (e.g., ~/scripts/run_sim.sh) for convenience
+
+OUTPUT FILES:
+
+When running with Zarr backend:
+- data.zr/                # Zarr format directory (columnar storage)
+
+When running with SQLite backend:
+- data.db                 # SQLite database file
+
+ANALYZING DATA:
+
+Zarr backend:
+```bash
+conda activate zarr-env
+cd ${INSCIGHT_DIR}
+python python/read_zarr.py data.zr
+```
+
+SQLite backend:
+```bash
+# Query first few rows
 sqlite3 data.db "SELECT * FROM transactions LIMIT 5;"
 
-get all field names from sqlite:
+# Get schema information
 sqlite3 data.db "PRAGMA table_info(transactions);"
-
-or to get just the column names:
 sqlite3 data.db ".schema transactions"
-
-to ssh into utm-vm:
-ssh utm-vm
+```
 
 === ZARR TRANSACTION STORAGE SCHEMA ===
 
@@ -340,12 +524,18 @@ WORKFLOW FOR LONGER SIMULATIONS:
    a) Run a short test simulation:
       ```bash
       export INSCIGHT=zarr
-      doit  # Default runs 100us simulation
+      cd ${INSCIGHT_DIR}
+      # Run your simulation script with default duration (e.g., 100us)
+      ${AVP64_INSTALL}/bin/avp64-runner \
+        -f ${AVP64_INSTALL}/sw/your-config.cfg \
+        --trace-inscight \
+        -c system.trace=1 \
+        -c system.duration="100us"
       ```
 
    b) Count transactions from test run:
       ```bash
-      conda activate z5-dev
+      conda activate zarr-env
       python python/read_zarr.py data.zr
       # Note the highest transaction ID
       ```
@@ -358,6 +548,8 @@ WORKFLOW FOR LONGER SIMULATIONS:
 
 2. Modify database_zarr.cpp with appropriate sizes:
 
+   Location: ${INSCIGHT_DIR}/database_zarr.cpp
+
    - Change shape = {10000} to shape = {500000}
    - Change jsonShape = {10000, 512} to jsonShape = {500000, 512}
    - Change the capacity check from 10000 to 500000
@@ -365,41 +557,47 @@ WORKFLOW FOR LONGER SIMULATIONS:
 
 3. Rebuild the binary (do this NOT in a conda env):
    ```bash
-   make -f ~/Dev/scripts/makebuild
+   cd ${AVP64_BUILD}
+   cmake -DAVP64_BUILD_TESTS=OFF \
+         -DCMAKE_INSTALL_PREFIX=${AVP64_INSTALL} \
+         -DCMAKE_BUILD_TYPE=Release \
+         ..
+   make -j$(nproc)
+   sudo make install
    ```
-
-   This will:
-   - Run cmake in /home/dusti/Dev/avp64/build
-   - Build with make -j12
-   - Install to /opt/avp64
 
 4. Delete old data.zr (incompatible with new shape):
    ```bash
+   cd ${INSCIGHT_DIR}
    rm -rf data.zr
    ```
 
 5. Adjust simulation duration and run:
 
-   The simulation duration is controlled in ~/Dev/scripts/doit:
+   The simulation duration is controlled via command line parameter:
    ```bash
-   -c system.duration="100us"   # Current default
-   ```
-
-   To run longer simulations, modify doit script:
-   ```bash
+   -c system.duration="100us"   # 100 microseconds
    -c system.duration="10ms"    # 10 milliseconds
    -c system.duration="1s"      # 1 second
    ```
 
-   Then run:
+   Run longer simulation:
    ```bash
    export INSCIGHT=zarr
-   doit
+   cd ${INSCIGHT_DIR}
+   ${AVP64_INSTALL}/bin/avp64-runner \
+     -f ${AVP64_INSTALL}/sw/your-config.cfg \
+     --trace-inscight \
+     -c system.trace=1 \
+     -c system.duration="10ms" \
+     -c system.cpu.arm0.allow_dmi="false"
+     # ... (repeat for all CPUs)
    ```
 
 6. Verify data wasn't truncated:
    ```bash
-   conda activate z5-dev
+   conda activate zarr-env
+   cd ${INSCIGHT_DIR}
    python python/read_zarr.py data.zr
    # Check highest transaction ID is less than your array size
    # If you see "[database_zarr] Warning: Dataset full" in simulation output,
@@ -409,24 +607,26 @@ WORKFLOW FOR LONGER SIMULATIONS:
 7. Monitor in real-time (optional):
    ```bash
    # In one terminal, run simulation
-   doit
+   cd ${INSCIGHT_DIR}
+   ${AVP64_INSTALL}/bin/avp64-runner ...
 
    # In another terminal, watch transaction count grow
-   watch -n 1 'ls -lh data.zr/*/0.0 2>/dev/null | head'
+   watch -n 1 'ls -lh ${INSCIGHT_DIR}/data.zr/*/0.0 2>/dev/null | head'
    ```
 
-SIMULATION CONFIGURATION (~/Dev/scripts/doit):
+SIMULATION CONFIGURATION:
 
-The doit script runs the avp64-runner with several key parameters that affect data collection:
+The avp64-runner accepts several key parameters that affect data collection:
 
 ```bash
-/opt/avp64/bin/avp64-runner \
-  -f /opt/avp64/sw/buildroot_6_5_6-x8.cfg \    # System configuration
+${AVP64_INSTALL}/bin/avp64-runner \
+  -f ${AVP64_INSTALL}/sw/your-config.cfg \     # System configuration file
   --trace-inscight \                            # Enable inscight tracing
   -c system.trace=1 \                           # Enable transaction tracing
   -c system.duration="100us" \                  # Simulation duration
   -c system.cpu.arm0.allow_dmi="false" \        # Force all transactions through TLM
-  ...                                           # (repeated for all 8 CPUs)
+  -c system.cpu.arm1.allow_dmi="false" \        # (repeat for all CPUs in your system)
+  ...
 ```
 
 Key parameters:
